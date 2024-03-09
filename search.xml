@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>HTTP常见状态码</title>
+      <link href="/2024/03/09/HTTP%E5%B8%B8%E8%A7%81%E7%8A%B6%E6%80%81%E7%A0%81/"/>
+      <url>/2024/03/09/HTTP%E5%B8%B8%E8%A7%81%E7%8A%B6%E6%80%81%E7%A0%81/</url>
+      
+        <content type="html"><![CDATA[<h2 id="常见状态码"><a href="#常见状态码" class="headerlink" title="常见状态码"></a>常见状态码</h2><ul><li><p>1XX：消息状态码。</p></li><li><p>2XX：成功状态码。</p></li><li><p>3XX：重定向状态码。</p></li><li><p>4XX：客户端错误状态码。</p></li><li><p>5XX：服务端错误状态码。</p></li><li><p>200：状态码 <strong><code>200 OK</code></strong> 表明请求已经成功。默认情况下状态码为 200 的响应可以被缓存。</p></li><li><p>201：**<code>201 Created</code>** 是一个代表成功的应答状态码，表示请求已经被成功处理，并且创建了新的资源。</p></li><li><p>202：响应状态码 <strong>202 Accepted</strong> 表示服务器端已经收到请求消息，但是尚未进行处理。</p></li><li><p>301： <strong><code>301 Moved Permanently</code></strong> 永久重定向，请求的资源已被永久的移动到新 URI。</p></li><li><p>304：HTTP <strong><code>304 Not Modified</code></strong> 说明无需再次传输请求的内容，也就是说可以使用缓存的内容。</p></li><li><p>403：状态码 <strong><code>403 Forbidden</code></strong> 代表客户端错误，指的是服务器端有能力处理该请求，但是拒绝授权访问。</p></li><li><p>404：HTTP 响应状态码 <strong><code>404 Not Found</code></strong> 指的是服务器无法找到所请求的资源。</p></li><li><p>500：**<code>500 Internal Server Error</code>** 是表示服务器端错误的响应状态码，意味着所请求的服务器遇到意外的情况并阻止其执行请求。</p></li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> 网络 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 网络 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>HTTP缓存</title>
       <link href="/2024/03/09/HTTP%E7%BC%93%E5%AD%98/"/>
       <url>/2024/03/09/HTTP%E7%BC%93%E5%AD%98/</url>
