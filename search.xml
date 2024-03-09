@@ -4,6 +4,56 @@
   
     
     <entry>
+      <title>浏览器本地缓存</title>
+      <link href="/2024/03/09/%E6%B5%8F%E8%A7%88%E5%99%A8%E6%9C%AC%E5%9C%B0%E7%BC%93%E5%AD%98/"/>
+      <url>/2024/03/09/%E6%B5%8F%E8%A7%88%E5%99%A8%E6%9C%AC%E5%9C%B0%E7%BC%93%E5%AD%98/</url>
+      
+        <content type="html"><![CDATA[<h2 id="localStorage"><a href="#localStorage" class="headerlink" title="localStorage"></a>localStorage</h2><p>​localStorage  是一种持久性的本地存储机制，可以用来存储较大量级的数据，并且该数据会一直保存在客户端，即使用户关闭了浏览器也不会被清除。该数据是以键值对的形式存储的，可以通过 JavaScript API 进行读取和写入。localStorage 存储的数据对于同一域名下的所有页面都是可见的。</p><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 设置</span></span><br><span class="line"><span class="variable language_">localStorage</span>.<span class="title function_">setItem</span>(<span class="string">&quot;myCat&quot;</span>, <span class="string">&quot;Tom&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 访问</span></span><br><span class="line"><span class="keyword">let</span> cat = <span class="variable language_">localStorage</span>.<span class="title function_">getItem</span>(<span class="string">&quot;myCat&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 移除指定项</span></span><br><span class="line"><span class="variable language_">localStorage</span>.<span class="title function_">removeItem</span>(<span class="string">&quot;myCat&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 移除所有</span></span><br><span class="line"><span class="variable language_">localStorage</span>.<span class="title function_">clear</span>();</span><br></pre></td></tr></table></figure><h2 id="sessionStorage"><a href="#sessionStorage" class="headerlink" title="sessionStorage"></a>sessionStorage</h2><p>​sessionStorage  也是一种本地存储机制，但相比于localStorage，数据的生命周期更短暂。数据只在当前会话（session）期间有效，当用户关闭浏览器标签页或浏览器时，存储的数据会被清除。同样地，sessionStorage 也以键值对的形式存储数据，并可以通过 JavaScript API 进行访问。sessionStorage 存储的数据只对当前标签页可见。</p><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 保存数据到 sessionStorage</span></span><br><span class="line"><span class="variable language_">sessionStorage</span>.<span class="title function_">setItem</span>(<span class="string">&quot;key&quot;</span>, <span class="string">&quot;value&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 从 sessionStorage 获取数据</span></span><br><span class="line"><span class="keyword">let</span> data = <span class="variable language_">sessionStorage</span>.<span class="title function_">getItem</span>(<span class="string">&quot;key&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 从 sessionStorage 删除保存的数据</span></span><br><span class="line"><span class="variable language_">sessionStorage</span>.<span class="title function_">removeItem</span>(<span class="string">&quot;key&quot;</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 从 sessionStorage 删除所有保存的数据</span></span><br><span class="line"><span class="variable language_">sessionStorage</span>.<span class="title function_">clear</span>();</span><br></pre></td></tr></table></figure><h2 id="indexedDB"><a href="#indexedDB" class="headerlink" title="indexedDB"></a>indexedDB</h2><p>​indexedDB 是一种更强大的客户端数据库，它允许开发者存储大量结构化数据，并提供了高效的查询和索引功能。indexedDB  是一个事务性数据库，支持离线应用程序和大规模数据集的存储。与localStorage和sessionStorage不同，indexedDB  是异步的，使用回调或Promise进行操作。indexedDB 的存储空间更大，但使用起来相对复杂一些。</p><h2 id="cookie"><a href="#cookie" class="headerlink" title="cookie"></a>cookie</h2><p>​HTTP Cookie（也叫 Web Cookie 或浏览器 Cookie）是<strong>服务器发送到用户浏览器</strong>并保存在本地的一小块数据。浏览器会存储 cookie 并在下次向同一服务器再发起请求时<strong>携带并发送到服务器上。</strong></p><p>通常，它用于告知服务端两个请求是否来自同一浏览器，<strong>以便于保持用户的登录状态</strong>。Cookie 使基于<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Overview#http_%E6%98%AF%E6%97%A0%E7%8A%B6%E6%80%81%EF%BC%8C%E6%9C%89%E4%BC%9A%E8%AF%9D%E7%9A%84">无状态</a>的 HTTP 协议记录稳定的状态信息成为了可能。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 网络 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 网络 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>HTTP标头</title>
+      <link href="/2024/03/09/HTTP%E6%A0%87%E5%A4%B4/"/>
+      <url>/2024/03/09/HTTP%E6%A0%87%E5%A4%B4/</url>
+      
+        <content type="html"><![CDATA[<h2 id="What"><a href="#What" class="headerlink" title="What"></a>What</h2><p><strong>HTTP 标头</strong> 允许客户端和服务器通过 HTTP 请求&#x2F;响应传递的附加信息。</p><p>根据不同的消息上下文，标头可以分为：</p><ul><li><a href="https://developer.mozilla.org/zh-CN/docs/Glossary/Request_header">请求标头</a>包含有关要获取的资源或客户端或请求资源的客户端的更多信息。</li><li><a href="https://developer.mozilla.org/zh-CN/docs/Glossary/Response_header">响应标头</a>包含有关响应的额外信息，例如响应的位置或者提供响应的服务器。</li><li><a href="https://developer.mozilla.org/zh-CN/docs/Glossary/Representation_header">表示标头</a>包含资源主体的信息，例如主体的 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Basics_of_HTTP/MIME_types">MIME 类型</a>或者应用的编码&#x2F;压缩方案。</li><li><a href="https://developer.mozilla.org/zh-CN/docs/Glossary/Payload_header">有效负荷标头</a>包含有关有效载荷数据表示的单独信息，包括内容长度和用于传输的编码。</li></ul><h2 id="请求标头"><a href="#请求标头" class="headerlink" title="请求标头"></a>请求标头</h2><p><strong>请求标头</strong>是一种 <a href="https://developer.mozilla.org/zh-CN/docs/Glossary/HTTP_header">HTTP 标头</a>，它可在 HTTP 请求中使用，其提供有关请求上下文的信息，以便服务器可以定制响应。</p><ol><li><strong>Host</strong>：指定要请求的主机名和端口号。</li><li><strong>User-Agent</strong>：包含发起请求的用户代理（浏览器、操作系统等）信息。</li><li><strong>Accept</strong>：指定客户端能够接受的内容类型。</li><li><strong>Accept-Language</strong>：指定客户端偏好的语言。</li><li><strong>Accept-Encoding</strong>：指定客户端支持的内容编码方式。</li><li><strong>Referer</strong>：包含了当前页面的来源页面的 URL。</li><li><strong>Cookie</strong>：包含了之前由服务器发送的 Cookie 信息，以便服务器识别客户端状态。</li><li><strong>Authorization</strong>：包含了客户端认证信息，用于访问受保护的资源。</li><li><strong>Connection</strong>：指示客户端与服务器之间连接的状态。</li><li><strong>Content-Type</strong>：指定请求或响应中的实体的媒体类型。</li><li><strong>Content-Length</strong>：指定请求或响应中的实体主体的长度。</li></ol><h2 id="响应标头"><a href="#响应标头" class="headerlink" title="响应标头"></a>响应标头</h2><ol><li><strong>Status</strong>：指定响应的状态码和对应的文本描述。</li><li><strong>Content-Type</strong>：指定响应中实体的媒体类型。</li><li><strong>Content-Length</strong>：指定响应中实体主体的长度。</li><li><strong>Location</strong>：在重定向响应中，指定新的资源位置。</li><li><strong>Cache-Control</strong>：指示缓存如何处理响应内容。</li><li><strong>ETag</strong>：指定实体的唯一标识符，用于验证缓存的新鲜度。</li><li><strong>Last-Modified</strong>：指定实体最后修改的时间。</li><li><strong>Set-Cookie</strong>：在响应中设置新的 Cookie 信息，用于客户端保存状态。</li><li><strong>Server</strong>：指明服务器软件的名称和版本。</li><li><strong>Access-Control-Allow-Origin</strong>：指定允许访问资源的域名，用于跨域请求。</li><li><strong>Expires</strong>：指定响应的过期时间，用于缓存控制。</li><li><strong>Age</strong>：消息头里包含对象在缓存代理中存贮的时长，以秒为单位。</li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> 网络 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 网络 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>HTTP Cookie</title>
       <link href="/2024/03/09/HTTP-Cookie/"/>
       <url>/2024/03/09/HTTP-Cookie/</url>
