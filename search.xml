@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>HTTP Cookie</title>
+      <link href="/2024/03/09/HTTP-Cookie/"/>
+      <url>/2024/03/09/HTTP-Cookie/</url>
+      
+        <content type="html"><![CDATA[<h2 id="What"><a href="#What" class="headerlink" title="What"></a>What</h2><p>HTTP Cookie（也叫 Web Cookie 或浏览器 Cookie）是<strong>服务器发送到用户浏览器</strong>并保存在本地的一小块数据。浏览器会存储 cookie 并在下次向同一服务器再发起请求时<strong>携带并发送到服务器上。</strong></p><p>通常，它用于告知服务端两个请求是否来自同一浏览器，<strong>以便于保持用户的登录状态</strong>。Cookie 使基于<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Overview#http_%E6%98%AF%E6%97%A0%E7%8A%B6%E6%80%81%EF%BC%8C%E6%9C%89%E4%BC%9A%E8%AF%9D%E7%9A%84">无状态</a>的 HTTP 协议记录稳定的状态信息成为了可能。</p><h2 id="Cookie的作用"><a href="#Cookie的作用" class="headerlink" title="Cookie的作用"></a>Cookie的作用</h2><ul><li>会话状态的管理：用户登录状态，用户的数据的记录信息。</li><li>个性化设置：用户的自定义设置、主题设置</li><li>浏览器行为跟踪：跟踪分析用户行为等，例如用户平均驻留时间，用户浏览内容偏好等。</li></ul><h2 id="创建Cookie"><a href="#创建Cookie" class="headerlink" title="创建Cookie"></a>创建Cookie</h2><p>服务器收到 HTTP 请求后，服务器可以在响应标头里面添加一个或多个 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Set-Cookie"><code>Set-Cookie</code></a> 选项。浏览器收到响应后通常会保存下 Cookie，并将其放在 HTTP <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Cookie"><code>Cookie</code></a> 标头内，向同一服务器发出请求时一起发送。</p><h3 id="Set-Cookie-和-Cookie-标头"><a href="#Set-Cookie-和-Cookie-标头" class="headerlink" title="Set-Cookie 和 Cookie 标头"></a>Set-Cookie 和 Cookie 标头</h3><p>服务器使用 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Set-Cookie"><code>Set-Cookie</code></a> 响应头部向用户代理（一般是浏览器）发送 Cookie 信息。</p><figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">HTTP/1.0</span> <span class="number">200</span> OK</span><br><span class="line"><span class="attribute">Content-type</span><span class="punctuation">: </span>text/html</span><br><span class="line"><span class="attribute">Set-Cookie</span><span class="punctuation">: </span>yummy_cookie=choco</span><br><span class="line"><span class="attribute">Set-Cookie</span><span class="punctuation">: </span>tasty_cookie=strawberry</span><br><span class="line"></span><br><span class="line"><span class="language-angelscript"><span class="string">[页面内容]</span></span></span><br></pre></td></tr></table></figure><p>接下来对于该服务器发起的每一次新请求，浏览器都会将之前保存的 Cookie 信息通过 <a href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers/Cookie"><code>Cookie</code></a> 请求头部再发送给服务器。</p><figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/sample_page.html</span> <span class="meta">HTTP/1.1</span></span><br><span class="line"><span class="attribute">Host</span><span class="punctuation">: </span>www.example.org</span><br><span class="line"><span class="attribute">Cookie</span><span class="punctuation">: </span>yummy_cookie=choco; tasty_cookie=strawberry</span><br></pre></td></tr></table></figure><h3 id="Cookie生命周期"><a href="#Cookie生命周期" class="headerlink" title="Cookie生命周期"></a>Cookie生命周期</h3><p>可以通过以下两种方式定义</p><ul><li><em>会话期</em> Cookie 会在当前的会话结束之后删除。浏览器定义了“当前会话”结束的时间，一些浏览器重启时会使用<em>会话恢复</em>。这可能导致会话 cookie 无限延长。</li><li><em>持久性</em> Cookie 在过期时间（<code>Expires</code>）指定的日期或有效期（<code>Max-Age</code>）指定的一段时间后被删除。</li></ul><figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Set-Cookie</span><span class="punctuation">: </span>id=a3fWa; Expires=Wed, 21 Oct 2015 07:28:00 GMT;</span><br></pre></td></tr></table></figure><h3 id="限制Cookie的访问"><a href="#限制Cookie的访问" class="headerlink" title="限制Cookie的访问"></a>限制Cookie的访问</h3><p>有两种方法可以确保 <code>Cookie</code> 被安全发送，并且不会被意外的参与者或脚本访问：<code>Secure</code> 属性和 <code>HttpOnly</code> 属性。</p><p>标记为 <code>Secure</code> 的 Cookie 只应通过被 HTTPS 协议加密过的请求发送给服务端。它永远不会使用不安全的 HTTP 发送（本地主机除外），这意味着<a href="https://developer.mozilla.org/zh-CN/docs/Glossary/MitM">中间人</a>攻击者无法轻松访问它。</p><p>JavaScript <a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Document/cookie"><code>Document.cookie</code></a> API 无法访问带有 <code>HttpOnly</code> 属性的 cookie；此类 Cookie 仅作用于服务器。例如，持久化服务器端会话的 Cookie 不需要对 JavaScript 可用，而应具有 <code>HttpOnly</code> 属性。此预防措施有助于缓解<a href="https://developer.mozilla.org/en-US/docs/Web/Security/Types_of_attacks">跨站点脚本（XSS） (en-US)</a>攻击。</p><figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Set-Cookie</span><span class="punctuation">: </span>id=a3fWa; Expires=Wed, 21 Oct 2015 07:28:00 GMT; Secure; HttpOnly</span><br></pre></td></tr></table></figure><h2 id="Cookie安全"><a href="#Cookie安全" class="headerlink" title="Cookie安全"></a>Cookie安全</h2><p>缓解涉及 Cookie 的攻击的方法：</p><ul><li>使用 <code>HttpOnly</code> 属性可防止通过 JavaScript 访问 cookie 值。</li><li>用于敏感信息（例如指示身份验证）的 Cookie 的生存期应较短，并且 <code>SameSite</code> 属性设置为 <code>Strict</code> 或 <code>Lax</code>。</li></ul><h2 id="跟踪和隐私"><a href="#跟踪和隐私" class="headerlink" title="跟踪和隐私"></a>跟踪和隐私</h2><p>第一方 Cookie是由用户直接访问的网站设置并存储在用户设备上的小型文本文件。这些 Cookie 主要用于存储用户在当前网站上的个人偏好、登录状态和其他相关信息，以提供更好的用户体验。</p><p>第三方 Cookie是由不同于用户正在访问的网站的第三方域设置的。它们通常用于跟踪用户的浏览行为和兴趣，以向用户提供定制化的广告内容。例如，广告商可以在多个网站上放置相同的广告，并使用第三方 Cookie 跟踪用户的点击和购买习惯，以便为用户提供个性化的广告推荐。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 网络 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 网络 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>HTTP常见状态码</title>
       <link href="/2024/03/09/HTTP%E5%B8%B8%E8%A7%81%E7%8A%B6%E6%80%81%E7%A0%81/"/>
       <url>/2024/03/09/HTTP%E5%B8%B8%E8%A7%81%E7%8A%B6%E6%80%81%E7%A0%81/</url>
