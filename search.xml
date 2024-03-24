@@ -11,6 +11,18 @@
         <content type="html"><![CDATA[<p><strong>CSS 预处理器</strong>是一个能让你通过预处理器自己独有的语法来生成<a href="https://developer.mozilla.org/zh-CN/docs/Glossary/CSS">CSS</a>的程序。市面上有很多 CSS 预处理器可供选择，且绝大多数 CSS 预处理器会增加一些原生 CSS 不具备的特性，例如代码混合，嵌套选择器，继承选择器等。这些特性让 CSS 的结构更加具有可读性且易于维护。</p><h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>​<a href="https://link.juejin.cn/?target=https://sass-lang.com/guide">Sass</a>: 诞生于2007年，最早也是最成熟的一款CSS预处理器语言。可以使用常量、变量、函数、混入、函数等功能，最后会编译成合法的CSS让浏览器使用。</p><p>​Sass 有两种语法！SCSS语法( <code>.scss</code>) 最常用。它是CSS的超集，这意味着所有有效的CSS也是有效的SCSS。缩进语法 ( <code>.sass</code>) 更不寻常：它使用缩进而不是花括号来嵌套语句，并使用换行符而不是分号来分隔它们。</p><h2 id="变量"><a href="#变量" class="headerlink" title="变量"></a>变量</h2><p>​可以通过变量的方式来表示CSS样式。可以存储颜色、字体大小、布局或你认为想要重用的任何CSS样式。 Sass 使用<code>$</code>符号使的css样式成为变量。</p><p><img src="D:\other-tool\Typora\img\image-20240324223051631.png" alt="image-20240324223051631"></p><p><img src="D:\other-tool\Typora\img\image-20240324223101849.png" alt="image-20240324223101849"></p><h2 id="嵌套"><a href="#嵌套" class="headerlink" title="嵌套"></a>嵌套</h2><p>在编写HTML时，它具有清晰的嵌套和视觉层次结构。但是CSS样式的编写是扁平化的不支持类似的嵌套结构。</p><p>Sass 允许您以遵循HTML相同视觉层次结构的方式嵌套CSS选择器。请注意，过度嵌套会导致CSS样式会导致难以维护，并且通常被认为是不好的做法。 </p><p><img src="D:\other-tool\Typora\img\image-20240324223126884.png" alt="image-20240324223126884"></p><p><img src="D:\other-tool\Typora\img\image-20240324223136796.png" alt="image-20240324223136796"></p><h2 id="模块化"><a href="#模块化" class="headerlink" title="模块化"></a>模块化</h2><p>​不必将所有 Sass 写入一个文件中。您可以根据<code>@use</code>规则将其拆分。此规则将另一个 Sass 文件加载为 <em>module</em>，这意味着你可以使用基于文件名来引用 Sass 文件中的变量、 <a href="https://sass-lang.com/guide/#mixins">mixins</a>和 <a href="https://sass-lang.com/documentation/at-rules/function">函数</a>。使用文件还将在编译输出中包含它生成的CSS 。使用@use 相当于导入scss文件，之后可以使用  <strong>导入文件名.的方式</strong>  使用scss文件中定义的css变量。这很像你在使用JS在编程。</p><p><img src="D:\other-tool\Typora\img\image-20240324224131732.png" alt="image-20240324224131732"></p><p><img src="D:\other-tool\Typora\img\image-20240324224139120.png" alt="image-20240324224139120"></p><h2 id="Mixins混入"><a href="#Mixins混入" class="headerlink" title="Mixins混入"></a>Mixins混入</h2><p>​为了有效的维护和开发项目，代码的重复利用就显得尤为重要。这对于css样式开发同样重要。@mixin 指令能提高你代码的重复使用率并简化你的代码。</p><p>​@mixin指令允许定义可以在整个样式表中重复使用的样式，而避免了使用无语意的类（class），混入(@mixin)还可以包含所有的 CSS 规则，以及任何其他在 Sass 文档中被允许使用的东西，您甚至可以传递值以使您的 mixin 更加灵活。这就意味着只需<strong>少量的混入(@mixin)代码就能输出多样化且不重复的样式。</strong></p><p>​定义混入后通过 <code>@include</code> 调用混入</p><p><img src="D:\other-tool\Typora\img\image-20240324225558690.png" alt="image-20240324225558690"></p><p>​</p><h2 id="继承"><a href="#继承" class="headerlink" title="继承"></a>继承</h2><p>​使用<code>@extend</code>可让您将一组CSS属性从一个选择器共享到另一个选择器。这可以减少css样式代码量并提高样式复用。</p><p>但是你不需要该样式某一个属性，例如你不需要继承过来的 <code>font-size</code> 属性。但是继承的话就是继承全部属性，所以需要单独重新设置你不想继承的属性。</p><p><img src="D:\other-tool\Typora\img\image-20240324230019282.png" alt="image-20240324230019282"></p>]]></content>
       
       
+      <categories>
+          
+          <category> css预处理器 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Sass </tag>
+            
+        </tags>
       
     </entry>
     
