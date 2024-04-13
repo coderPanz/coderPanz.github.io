@@ -4,6 +4,56 @@
   
     
     <entry>
+      <title>服务端路由和客户端路由</title>
+      <link href="/2024/04/13/%E6%9C%8D%E5%8A%A1%E7%AB%AF%E8%B7%AF%E7%94%B1%E5%92%8C%E5%AE%A2%E6%88%B7%E7%AB%AF%E8%B7%AF%E7%94%B1/"/>
+      <url>/2024/04/13/%E6%9C%8D%E5%8A%A1%E7%AB%AF%E8%B7%AF%E7%94%B1%E5%92%8C%E5%AE%A2%E6%88%B7%E7%AB%AF%E8%B7%AF%E7%94%B1/</url>
+      
+        <content type="html"><![CDATA[<h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>​服务端路由和客户端路由是 web 应用程序中常见的两种路由机制，它们分别用于在服务端和客户端处理 URL 请求并将其映射到相应的处理程序或页面。</p><h3 id="服务端路由"><a href="#服务端路由" class="headerlink" title="服务端路由"></a>服务端路由</h3><p>​服务端路由指的是服务器根据用户访问的 URL 路径返回不同的响应结果。当我们在一个传统的服务端渲染的 web 应用中点击一个链接时，浏览器会从服务端获得全新的 HTML，然后重新加载整个页面。</p><p>服务端路由的特点包括：</p><ul><li>所有的 URL 请求都会先发送到服务器端，然后由服务器端根据路由规则来决定如何响应。</li><li>服务端路由可以实现对用户请求的身份验证、权限控制等安全机制。</li><li>由于每个请求都需要经过服务器端的处理，因此可能会增加服务器的负载。</li></ul><h3 id="客户端路由"><a href="#客户端路由" class="headerlink" title="客户端路由"></a>客户端路由</h3><p>​在<a href="https://developer.mozilla.org/en-US/docs/Glossary/SPA">单页面应用</a>中，客户端的 JavaScript 可以拦截页面的跳转请求，动态获取新的数据，然后在无需重新加载的情况下更新当前页面。这样通常可以带来更顺滑的用户体验，尤其是在更偏向“应用”的场景下，因为这类场景下用户通常会在很长的一段时间中做出多次交互。一个客户端路由器的实现就是利用 <a href="https://developer.mozilla.org/en-US/docs/Web/API/History">History API</a> 或 <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/hashchange_event"><code>hashchange</code> 事件</a>这样的web API 来管理应用当前应该渲染的视图。也就是监听浏览器 <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/hashchange_event"><code>hashchange</code> 事件</a>或使用 <a href="https://developer.mozilla.org/en-US/docs/Web/API/History">History API</a> 来动态切换当前组件。</p><p>客户端路由的特点包括：</p><ul><li>一旦初始化了前端应用，之后的路由切换不需要向服务器发起新的请求(&#x2F;虽然切换页面不需要发起请求但是切换的目标页面中的内容加载是需要发起请求的)，所有的路由切换都在客户端完成。</li><li>客户端路由可以提供更快的页面切换和响应速度，因为它不需要等待服务器的响应。</li><li>客户端路由对于构建交互式和响应式的 Web 应用非常有用，但对于搜索引擎优化（SEO）来说可能需要额外的处理。</li></ul><h3 id="History-API"><a href="#History-API" class="headerlink" title="History API"></a>History API</h3><p><strong><code>History</code></strong> 接口允许操作浏览器的历史标签页或者框架里访问的会话历史记录。允许开发者对浏览器历史记录进行操作，同时不会引起页面的重新加载。这使得开发者能够更灵活地管理页面的历史记录，实现无刷新页面内容的更新和路由控制。</p><p>属性：</p><ul><li>length（readonly）：返回一个整数（<code>Integer</code>），该整数表示会话历史中元素的数目，包括当前加载的页。更多请查看<a href="https://developer.mozilla.org/zh-CN/">MDN</a></li></ul><p>方法：</p><ul><li><code>back()</code>：转到浏览器会话历史的上一页，也就是返回操作。</li><li><code>forward()</code>：转到浏览器会话历史的下一页，向前操作。</li><li><code>go()</code>： 通过当前页面的相对位置从浏览器历史记录（会话记录）异步加载页面。</li><li>**pushState(state, title, url)**：<ul><li>将新的状态和 URL 添加到历史记录栈中。</li><li>参数：<ul><li><code>state</code>：一个表示新状态的对象，可以为空。</li><li><code>title</code>：页面的标题，目前大多数浏览器会忽略这个参数。</li><li><code>url</code>：新的 URL。</li></ul></li></ul></li><li>更多请查看<a href="https://developer.mozilla.org/zh-CN/">MDN</a></li></ul><p><strong>应用场景</strong></p><ol><li><strong>单页面应用程序（SPA）</strong>：在 SPA 中，History API 可以用于管理页面状态和路由，实现无刷新的页面内容更新和导航。</li><li><strong>网站导航</strong>：通过使用 <code>pushState</code> 和 <code>replaceState</code> 方法，网站可以实现更流畅的页面过渡和导航效果，同时保持页面状态。</li><li><strong>动态内容加载</strong>：可以通过 History API 在不刷新页面的情况下加载新的内容，从而提升用户体验。</li></ol><h3 id="hashchange"><a href="#hashchange" class="headerlink" title="hashchange"></a>hashchange</h3><p>当 URL 的片段标识符更改时，将触发<strong>hashchange</strong>事件 (跟在＃符号后面的 URL 部分，包括＃符号)，当用户点击页面内的链接，或者通过 JavaScript 修改 URL 中的 hash 时，<code>hashchange</code> 事件就会被触发。</p><h3 id="主要特点和用法"><a href="#主要特点和用法" class="headerlink" title="主要特点和用法"></a>主要特点和用法</h3><ol><li><strong>事件触发时机</strong>：<ul><li>当页面 URL 中的 hash 发生变化时，即 <code>#</code> 后面的部分改变时，<code>hashchange</code> 事件被触发。</li><li>这个变化可能由用户在地址栏中手动输入、通过链接点击或 JavaScript 脚本修改 URL 触发。</li></ul></li><li><strong>事件处理</strong>：<ul><li>开发者可以通过监听 <code>window</code> 对象上的 <code>hashchange</code> 事件来捕获 URL 的 hash 变化。</li><li>一旦监听到 <code>hashchange</code> 事件，开发者可以执行相应的操作，例如更新页面内容或执行特定的 JavaScript 逻辑。</li></ul></li><li><strong>兼容性</strong>：<ul><li><code>hashchange</code> 事件在现代浏览器中得到了良好的支持，并且可以在大多数常见的浏览器中使用。</li><li>即使是在不支持 HTML5 的较老版本浏览器中，也通常能够正确触发 <code>hashchange</code> 事件。</li></ul></li><li><strong>应用场景</strong>：<ul><li><strong>单页面应用程序（SPA）</strong>：在 SPA 中，通常会使用 <code>hashchange</code> 事件来监听 URL 的变化，并根据 hash 的变化来更新页面内容，以实现无刷新的页面切换和导航。</li><li><strong>页面内导航</strong>：通过监听 <code>hashchange</code> 事件，可以实现单页网站内部的导航，例如在页面内滚动到特定位置或显示隐藏的内容。</li><li><strong>前端路由</strong>：许多前端路由库（如React Router、Vue Router等）使用 <code>hashchange</code> 事件来实现客户端路由导航。</li></ul></li></ol><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 监听 hashchange 事件</span></span><br><span class="line"><span class="variable language_">window</span>.<span class="title function_">addEventListener</span>(<span class="string">&#x27;hashchange&#x27;</span>, <span class="keyword">function</span>(<span class="params">event</span>) &#123;</span><br><span class="line">  <span class="comment">// 获取新的 hash 值</span></span><br><span class="line">  <span class="keyword">var</span> newHash = <span class="variable language_">window</span>.<span class="property">location</span>.<span class="property">hash</span>;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 根据 hash 值执行相应的操作</span></span><br><span class="line">  <span class="variable language_">console</span>.<span class="title function_">log</span>(<span class="string">&#x27;Hash changed to: &#x27;</span> + newHash);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      <categories>
+          
+          <category> 浏览器 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 浏览器 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>node事件循环</title>
+      <link href="/2024/04/13/node%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF/"/>
+      <url>/2024/04/13/node%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF/</url>
+      
+        <content type="html"><![CDATA[<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>​Node.js 事件循环（Event Loop）是 Node.js 实现异步 I&#x2F;O 操作的核心机制，它负责处理事件和执行回调函数，以实现非阻塞 I&#x2F;O 操作和异步编程。Node.js 事件循环的实现基于 libuv 库，它是一个跨平台的异步 I&#x2F;O  库，用于处理事件循环、文件系统操作、网络请求等。</p><p>​NodeJS 中包含的异步机制在和浏览器中的类似。除此之外，Node.js中还有一些其他的异步形式需要依靠nodejs特有的事件循环机制了。</p><ul><li>文件读取的I&#x2F;O操作：通过fs模块可实现异步IO操作。</li><li>process.nextTick()：在某些同步任务完成后立马执行。</li><li>server.close、httpServer等一些服务的关闭：关闭回调。</li><li>setImmediate()：与 setTimeout 在某些同步任务完成后立马执行。</li></ul><h2 id="node环境中代码运行流程"><a href="#node环境中代码运行流程" class="headerlink" title="node环境中代码运行流程"></a>node环境中代码运行流程</h2><ol><li>V8引解析JavaScript代码；</li><li>解析后的代码，调用Node API；</li><li>libuv库负责Node API的执行。将不同的任务分配给不同的线程，形成一个Event Loop（事件循环），以异步的方式将任务的执行结果返回给V8引擎；底层由C++实现所以不能在这里说JS单线程的问题。</li><li>V8引擎将结果返回给用户；</li></ol><h2 id="node事件循环流程"><a href="#node事件循环流程" class="headerlink" title="node事件循环流程"></a>node事件循环流程</h2><p>node事件循环在libuv的调控下分为6个过程，并循环执行这个过程。</p><ul><li><p><code>timers</code> ：setTimeout、setInterval的回调，并且该是在poll 阶段回调来执行的；</p></li><li><p><code>I/O </code>操作的回调：主要执行系统级别的回调函数，文件读取回调、服务端口的监听回调；</p></li><li><p><code>idle, prepare</code> 阶段：仅Node.js内部执行过程；</p></li><li><p><code>poll</code> 阶段：轮询等待新的链接和请求等事件，执行 I&#x2F;O 回调等；</p></li><li><p><code>check</code> 阶段：执行 setImmediate() 回调；</p></li><li><p><code>close 回调</code> 阶段：执行关闭请求的回调函数，比如socket.on(‘close’, …)</p></li></ul><p>​        上述每个阶段都会去执行完当前阶段对应的任务队列，然后继续执行当前阶段的微任务队列，只有当前阶段所有微任务都执行完了，才会进入下个阶段。这与浏览器事件循环不同。其中poll阶段会回到timeers阶段执行回调和I&#x2F;O回调。</p><h3 id="process-nextTick"><a href="#process-nextTick" class="headerlink" title="process.nextTick()"></a>process.nextTick()</h3><p>​上面提到了process.nextTick()，它是node中新引入的一个任务队列，它会在上述各个阶段结束时，在进入下一个阶段之前立即执行。在 Node.js 中，<code>process.nextTick()</code> 方法允许你在当前执行栈完成后立即执行一个回调函数。这个回调函数会在当前事件循环的末尾执行，在任何 I&#x2F;O 操作之前，即使这个 I&#x2F;O 操作是异步的。这使得 <code>process.nextTick()</code> 的执行优先级高于 <code>setTimeout()</code> 和 <code>setImmediate()</code>。</p><h3 id="宏任务和微任务"><a href="#宏任务和微任务" class="headerlink" title="宏任务和微任务"></a>宏任务和微任务</h3><p>Node.js事件循环的异步队列也分为两种：宏任务队列和微任务队列。</p><ul><li>常见的宏任务：I&#x2F;O 操作、setTimeout、setInterval、 setImmediate等。</li><li>常见的微任务：process.nextTick、promise().then()等。</li></ul><h3 id="setImmediate-和-setTimeout"><a href="#setImmediate-和-setTimeout" class="headerlink" title="setImmediate 和 setTimeout"></a>setImmediate 和 setTimeout</h3><p>setImmediate 和 setTimeout，这两者很相似，主要区别在于调用时机的不同：</p><ul><li><p><strong>setImmediate</strong>：在poll阶段完成时执行，即check阶段；</p></li><li><p><strong>setTimeout</strong>：在poll阶段为空闲时，且设定时间到达后执行，但它在timer阶段执行；</p></li></ul><h3 id="Node与浏览器Event-Loop差异"><a href="#Node与浏览器Event-Loop差异" class="headerlink" title="Node与浏览器Event Loop差异"></a><strong>Node与浏览器Event Loop差异</strong></h3><p>Node.js与浏览器的 Event Loop 差异如下：</p><ul><li>Node.js：microtask 在事件循环的各个阶段之间执行；</li><li>浏览器：microtask 在事件循环的 macrotask 执行完之后执行；</li></ul>]]></content>
+      
+      
+      <categories>
+          
+          <category> JS </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> JS </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>浏览器事件循环</title>
       <link href="/2024/04/13/%E6%B5%8F%E8%A7%88%E5%99%A8%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF/"/>
       <url>/2024/04/13/%E6%B5%8F%E8%A7%88%E5%99%A8%E4%BA%8B%E4%BB%B6%E5%BE%AA%E7%8E%AF/</url>
