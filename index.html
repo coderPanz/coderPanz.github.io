@@ -9,22 +9,13 @@ localStorage.dark = !(html.dataset.dark == 'true');
 html.dataset.dark = localStorage.dark;
 });</script><meta name="generator" content="Hexo 6.3.0"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">學吳紫荆的博客</h1><a id="logo" href="/.">學吳紫荆的博客</a><p class="description"></p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title"><a href="/2024/05/01/promise%E7%8A%B6%E6%80%81%E6%9C%BA%E5%B0%81%E8%A3%85/">promise状态机封装</a></h1><div class="post-meta">2024-05-01</div><div class="post-content">介绍promise是js控制代码的一种手段主要是用来负责进行异步编程，是一个状态机, 并且状态不可逆。promise有三种状态, 三种回调形式，两种函数触发状态发生改变。状态
 
-pending
-fulfilled
-rejected
+pending: 初始状态
+fulfilled: 兑现状态
+rejected: 拒绝状态
 
 回调
 
-then
-catch
-finally
-
-触发函数
-
-resolve
-rejecte
-
-代码实现123456789101...</div><p class="readmore"><a href="/2024/05/01/promise%E7%8A%B6%E6%80%81%E6%9C%BA%E5%B0%81%E8%A3%85/">阅读全文</a></p></div><div class="post"><h1 class="post-title"><a href="/2024/04/24/%E6%95%B0%E6%8D%AE%E5%9F%8B%E7%82%B9/">数据埋点</a></h1><div class="post-meta">2024-04-24</div><div class="post-content">介绍​		数据埋点是指在应用程序、网站或系统中插入代码以收集和记录特定事件或用户行为的过程。这些事件和行为可能包括用户点击按钮、页面访问、交易完成、访问数，访客数，停留时长，页面浏览数和跳出率等等。通过数据埋点，来进一步优化产品或是提供运营的数据支撑。
+then: 接收两个回调函数, 第一个为成功回调, 第二个为失败回调。返回prom...</div><p class="readmore"><a href="/2024/05/01/promise%E7%8A%B6%E6%80%81%E6%9C%BA%E5%B0%81%E8%A3%85/">阅读全文</a></p></div><div class="post"><h1 class="post-title"><a href="/2024/04/24/%E6%95%B0%E6%8D%AE%E5%9F%8B%E7%82%B9/">数据埋点</a></h1><div class="post-meta">2024-04-24</div><div class="post-content">介绍​		数据埋点是指在应用程序、网站或系统中插入代码以收集和记录特定事件或用户行为的过程。这些事件和行为可能包括用户点击按钮、页面访问、交易完成、访问数，访客数，停留时长，页面浏览数和跳出率等等。通过数据埋点，来进一步优化产品或是提供运营的数据支撑。
 埋点方式
 手动埋点： 开发者手动在应用程序的特定位置插入代码，以捕获和记录特定事件或用户行为。
 自动埋点：...</div><p class="readmore"><a href="/2024/04/24/%E6%95%B0%E6%8D%AE%E5%9F%8B%E7%82%B9/">阅读全文</a></p></div><div class="post"><h1 class="post-title"><a href="/2024/04/23/XML-JSON-HTML-JSX/">XML-JSON-HTML-JSX</a></h1><div class="post-meta">2024-04-23</div><div class="post-content">XML（可扩展标记语言）、JSON（JavaScript 对象表示法）、JSX（JavaScript XML）、HTML（超文本标记语言）都是用于描述数据或结构的标记语言，但在使用方式、用途和语法方面有所不同。
