@@ -1,0 +1,12 @@
+/* 在线链接服务仅供平台体验和调试使用，平台不承诺服务的稳定性，企业客户需下载字体包自行发布使用并做好备份。 */
+@font-face {
+  font-family: "钉钉进步体 Regular";
+  font-weight: 400;
+  src: url("../../assets/DingTalk-JinBuTi.woff2") format("woff2"),
+    url("../../assets//DingTalk-JinBuTi.woff") format("woff");
+  font-display: swap;
+}
+:root {
+  --vp-sidebar-width: 300px;
+  --vp-font-family-base: "钉钉进步体 Regular";
+}
