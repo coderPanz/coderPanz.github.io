@@ -14,9 +14,9 @@
 
 ​		可以通过变量的方式来表示CSS样式。可以存储颜色、字体大小、布局或你认为想要重用的任何CSS样式。 Sass 使用`$`符号使的css样式成为变量。
 
-![image-20240324223051631](D:\other-tool\Typora\img\image-20240324223051631.png)
+![image-20240324223051631](/css预处理器1.png)
 
-![image-20240324223101849](D:\other-tool\Typora\img\image-20240324223101849.png)
+![image-20240324223101849](/css预处理器2.png)
 
 
 
@@ -26,9 +26,9 @@
 
 Sass 允许您以遵循HTML相同视觉层次结构的方式嵌套CSS选择器。请注意，过度嵌套会导致CSS样式会导致难以维护，并且通常被认为是不好的做法。 
 
-![image-20240324223126884](D:\other-tool\Typora\img\image-20240324223126884.png)
+![image-20240324223126884](/css预处理器3.png)
 
-![image-20240324223136796](D:\other-tool\Typora\img\image-20240324223136796.png)
+![image-20240324223136796](/css预处理器4.png)
 
 
 
@@ -36,9 +36,9 @@ Sass 允许您以遵循HTML相同视觉层次结构的方式嵌套CSS选择器�
 
 ​		不必将所有 Sass 写入一个文件中。您可以根据`@use`规则将其拆分。此规则将另一个 Sass 文件加载为 *module*，这意味着你可以使用基于文件名来引用 Sass 文件中的变量、 [mixins](https://sass-lang.com/guide/#mixins)和 [函数](https://sass-lang.com/documentation/at-rules/function)。使用文件还将在编译输出中包含它生成的CSS 。使用@use 相当于导入scss文件，之后可以使用  **导入文件名.的方式**  使用scss文件中定义的css变量。这很像你在使用JS在编程。
 
-![image-20240324224131732](D:\other-tool\Typora\img\image-20240324224131732.png)
+![image-20240324224131732](/css预处理器5.png)
 
-![image-20240324224139120](D:\other-tool\Typora\img\image-20240324224139120.png)
+![image-20240324224139120](/css预处理器6.png)
 
 
 
@@ -50,7 +50,7 @@ Sass 允许您以遵循HTML相同视觉层次结构的方式嵌套CSS选择器�
 
 ​		定义混入后通过 `@include` 调用混入
 
-![image-20240324225558690](D:\other-tool\Typora\img\image-20240324225558690.png)
+![image-20240324225558690](/css预处理器7.png)
 
 ​		
 
@@ -60,7 +60,7 @@ Sass 允许您以遵循HTML相同视觉层次结构的方式嵌套CSS选择器�
 
 但是你不需要该样式某一个属性，例如你不需要继承过来的 `font-size` 属性。但是继承的话就是继承全部属性，所以需要单独重新设置你不想继承的属性。
 
-![image-20240324230019282](D:\other-tool\Typora\img\image-20240324230019282.png)
+![image-20240324230019282](/css预处理器8.png)
 
 
 
