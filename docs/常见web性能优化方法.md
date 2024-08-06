@@ -105,7 +105,7 @@ img {
 
 ### 脚本预加载和延迟加载
 
-在html文档的头部<head>中使用<link>并使用 [`rel="preload"`](https://developer.mozilla.org/zh-CN/docs/Web/HTML/Attributes/rel/preload) 来为关键 JavaScript 创建一个预加载器并且**不会阻塞渲染**：
+在html文档的头部`<head>`中使用`<link>`并使用 [`rel="preload"`](https://developer.mozilla.org/zh-CN/docs/Web/HTML/Attributes/rel/preload) 来为关键 JavaScript 创建一个预加载器并且**不会阻塞渲染**：
 
 ```html
 <head>
