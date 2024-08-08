@@ -18,11 +18,11 @@ hero:
       link: /api-examples
 
 features:
-
-  - title: 前端开发工作者
+  - icon: 💯
+    title: 前端开发工作者
     details: 前端应届选手、周杰伦、陶喆、国漫、足球
 
-  - icon:
+  - icon: 
       src: '/美团横式色彩标识.png'
     title: 实习经历：美团
     details: 职位：大前端
@@ -33,3 +33,10 @@ features:
     details: 职位：前端开发
 ---
 
+## Getting Started
+
+
+```javascript
+console.log('hello world!')
+```
+![斩神](/斩神-凡尘神域.png)
