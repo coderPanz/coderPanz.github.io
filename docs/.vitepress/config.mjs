@@ -26,6 +26,15 @@ export default defineConfig({
         ],
       },
       {
+        text: "项目",
+        collapsed: true,
+        items: [
+          { text: "吉比特短剧数据中台", link: "/吉比特短剧数据中台" },
+          { text: "npm依赖分析工具", link: "/npm依赖分析工具" },
+          { text: "vue-react-cli", link: "/vue-react-cli" },
+        ],
+      },
+      {
         text: "JS",
         collapsed: true,
         items: [
@@ -48,6 +57,7 @@ export default defineConfig({
           { text: "promise并发", link: "/promise并发" },
           { text: "promise状态机封装", link: "/promise状态机封装" },
           { text: "this指向", link: "/this指向" },
+          { text: "开发小tips", link: "/开发小tips" },
         ],
       },
       {
