@@ -25,15 +25,15 @@ export default defineConfig({
           { text: "随笔三", link: "/随笔三" },
         ],
       },
-      {
-        text: "项目",
-        collapsed: true,
-        items: [
-          { text: "吉比特短剧数据中台", link: "/吉比特短剧数据中台" },
-          { text: "npm依赖分析工具", link: "/npm依赖分析工具" },
-          { text: "vue-react-cli", link: "/vue-react-cli" },
-        ],
-      },
+      // {
+      //   text: "项目",
+      //   collapsed: true,
+      //   items: [
+      //     { text: "吉比特短剧数据中台", link: "/吉比特短剧数据中台" },
+      //     { text: "npm依赖分析工具", link: "/npm依赖分析工具" },
+      //     { text: "vue-react-cli", link: "/vue-react-cli" },
+      //   ],
+      // },
       {
         text: "JS",
         collapsed: true,
@@ -61,12 +61,16 @@ export default defineConfig({
         ],
       },
       {
-        text: "算法基础",
+        text: "leetcode-hot",
         collapsed: true,
         items: [
           { text: "常见的排序算法", link: "/常见的排序算法" },
           { text: "常见搜索算法", link: "/常见搜索算法" },
           { text: "算法-哈希", link: "/算法-哈希" },
+          { text: "算法-滑动窗口", link: "/算法-滑动窗口" },
+          { text: "算法-普通数组", link: "/算法-普通数组" },
+          { text: "算法-双指针", link: "/算法-双指针" },
+          { text: "算法-子串", link: "/算法-子串" },
         ],
       },
       {
