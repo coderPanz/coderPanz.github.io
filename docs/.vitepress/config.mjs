@@ -98,6 +98,7 @@ export default defineConfig({
           { text: "babel软件工具包", link: "/babel软件工具包" },
           { text: "CSS预处理器-Less", link: "/CSS预处理器-Less" },
           { text: "CSS预处理器-Sass", link: "/CSS预处理器-Sass" },
+          { text: "vite", link: "/vite" },
         ],
       },
       {
