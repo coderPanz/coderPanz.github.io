@@ -84,6 +84,7 @@ export default defineConfig({
           { text: "vue3响应式系统", link: "/vue3响应式系统" },
           { text: "vue2响应式系统", link: "/vue2响应式系统" },
           { text: "响应式流程解析", link: "/响应式流程解析" },
+          { text: "vue中的Watcher", link: "/vue中的watcher" },
         ],
       },
       {
