@@ -85,7 +85,10 @@ export default defineConfig({
           { text: "vue2响应式系统", link: "/vue2响应式系统" },
           { text: "响应式流程解析", link: "/响应式流程解析" },
           { text: "vue中的Watcher", link: "/vue中的watcher" },
-          { text: "vue调度器原理", link: "/vue调度器原理" },
+          {
+            text: "vue异步更新策略-nextTick原理",
+            link: "/vue异步更新策略-nextTick原理",
+          },
         ],
       },
       {
