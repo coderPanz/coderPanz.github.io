@@ -145,6 +145,14 @@ export default defineConfig({
           { text: "SQL和NoSQL", link: "/SQL和NoSQL" },
         ],
       },
+      {
+        text: "面试宝典",
+        collapsed: true,
+        items: [
+          { text: "JS手撕", link: "/JS常见手写题" },
+          { text: "计算机网络", link: "/计算机网络" },
+        ],
+      },
     ],
 
     socialLinks: [
