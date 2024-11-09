@@ -25,15 +25,13 @@ export default defineConfig({
           { text: "随笔三", link: "/随笔三" },
         ],
       },
-      // {
-      //   text: "项目",
-      //   collapsed: true,
-      //   items: [
-      //     { text: "吉比特短剧数据中台", link: "/吉比特短剧数据中台" },
-      //     { text: "npm依赖分析工具", link: "/npm依赖分析工具" },
-      //     { text: "vue-react-cli", link: "/vue-react-cli" },
-      //   ],
-      // },
+      {
+        text: "行业前端技术动态",
+        collapsed: true,
+        items: [
+          { text: "哈啰跨端组件库", link: "/哈啰跨端组件库" },
+        ],
+      },
       {
         text: "JS",
         collapsed: true,
