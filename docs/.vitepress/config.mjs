@@ -28,9 +28,7 @@ export default defineConfig({
       {
         text: "行业前端技术动态",
         collapsed: true,
-        items: [
-          { text: "哈啰跨端组件库", link: "/哈啰跨端组件库" },
-        ],
+        items: [{ text: "哈啰跨端组件库", link: "/哈啰跨端组件库" }],
       },
       {
         text: "JS",
@@ -87,6 +85,8 @@ export default defineConfig({
             text: "vue异步更新策略-nextTick原理",
             link: "/vue异步更新策略-nextTick原理",
           },
+          { text: "vue中的diff算法", link: "/vue中的diff算法" },
+          ,
         ],
       },
       {
