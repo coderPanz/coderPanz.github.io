@@ -128,6 +128,10 @@ export default defineConfig({
           { text: "工作者线程", link: "/工作者线程" },
           { text: "浏览器存储方案", link: "/浏览器存储方案" },
           { text: "浏览器的进程架构", link: "/浏览器的进程架构" },
+          {
+            text: "网站性能指标",
+            link: "/网站性能指标",
+          },
         ],
       },
       {
