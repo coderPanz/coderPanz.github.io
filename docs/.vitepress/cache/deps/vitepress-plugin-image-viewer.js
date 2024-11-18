@@ -4,7 +4,7 @@ import {
   watch
 } from "./chunk-574YRH25.js";
 
-// node_modules/viewerjs/dist/viewer.esm.js
+// node_modules/.pnpm/viewerjs@1.11.6/node_modules/viewerjs/dist/viewer.esm.js
 function ownKeys(e, r) {
   var t = Object.keys(e);
   if (Object.getOwnPropertySymbols) {
@@ -2829,7 +2829,7 @@ var Viewer = function() {
 }();
 assign(Viewer.prototype, render, events, handlers, methods, others);
 
-// node_modules/vitepress-plugin-image-viewer/lib/viewer.js
+// node_modules/.pnpm/vitepress-plugin-image-viewer@1.1.5/node_modules/vitepress-plugin-image-viewer/lib/viewer.js
 var viewer = null;
 var setViewer = (el = ".vp-doc", option) => {
   const defaultBaseOption = {

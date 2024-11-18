@@ -145,7 +145,32 @@ export default App;
 ![双端diff算法4](/双端diff算法4.png)  
 ![双端diff算法5](/双端diff算法5.png)  
 
+**非理想状态的处理方式**  
 
+我们知道双端 diff 算法的每一轮比较的过程都分为四个步骤，每轮比较都会命中一个，这是非常理想的情况，但实际上并非所有情况都这么理想。
+![双端diff非理想情况1](/双端diff非理想情况1.png)  
+上述节点排序情况，经过四轮比较都无法找到可复用的节点，只能看其他节点是否可复用。  
+具体做法：用新头节点遍历旧节点，看能否在旧节点中找到可复用节点，若找到则用 idxInold 变量记录对应位置。  
+怎样判断找到可复用节点，只要 idxInold > 0, 即可判断找到可复用节点。  
+找到可复用节点后进行移动操作。
+![双端diff非理想情况2](/双端diff非理想情况2.png)  
+  
+
+**添加和删除**  
+
+如果无法在旧节点中匹配到可复用的节点，证明该节点是一个新增节点。  
+![双端diff新增节点](/双端diff新增节点.png)  
+
+若经过匹配后，`newStartIdx > newEndIdx && oldStartIdx <= oldEndIdx`，代表已经更新结束，但旧的子节点任有未处理的节点，此时从 **oldStartIdx** 到 **oldEndIdx** 的范围内的所以节点就是属于要删除的节点，开启一个循环删除即可。
+```js
+if(newStartIdx > newEndIdx && oldStartIdx <= oldEndIdx) {
+  for(let i = oldStartIdx; i <= oldEndIdx; i++) {
+    // 删除函数unmount
+    unmount(oldNode[i])
+  }
+}
+```
+![双端diff删除节点](/双端diff删除节点.png)  
 
 ## 快速diff 算法
 vue2使用的是双端diff算法，而vue3则对diff进行了优化和升级为快速diff算法。
