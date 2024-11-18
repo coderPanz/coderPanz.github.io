@@ -154,6 +154,7 @@ export default defineConfig({
           { text: "JS手撕", link: "/JS常见手写题" },
           { text: "计算机网络", link: "/计算机网络" },
           { text: "看代码说结果", link: "/看代码说结果" },
+          { text: "css动画", link: "/css动画" },
         ],
       },
     ],
