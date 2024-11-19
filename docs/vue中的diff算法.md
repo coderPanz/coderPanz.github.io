@@ -173,11 +173,3 @@ if(newStartIdx > newEndIdx && oldStartIdx <= oldEndIdx) {
 ![双端diff删除节点](/双端diff删除节点.png)  
 
 ## 快速diff 算法
-vue2使用的是双端diff算法，而vue3则对diff进行了优化和升级为快速diff算法。
-预处理：在真正进入Diff之前，快速Diff会先执行一段”预处理“的前置操作，降低不必要的diff。举个例子。  
-下面两段文字只有名字不同，我们只需要修改名字即可。
-```html
-welcome 燕成昭 join us 希望学 
-welcome 潘启重 join us 希望学 
-```
-  过程： 在diff时会先从左边开始对比。一直到 燕成昭 和 潘启重，发现不一样就停止。然后从右边开始找发现右边也是一直到 燕成昭 和 潘启重 发现不同。因此，我们只用对  燕成昭 和 潘启重 这两个就行处理即可。
