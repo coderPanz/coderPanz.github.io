@@ -707,5 +707,729 @@ setTimeout(bar, 100) // 2
 // 硬绑定的 bar 不可能再修改它的 this
 bar.call(window) // 2
 ```
+我们创建了函数 bar()，并在它的内部手动调用了 foo.call(obj)，因此强制把 foo 的 this 绑定到了 obj。无论之后如何调用函数 bar，它总会手动在 obj 上调用 foo。这种绑定是一种显式的强制绑定，因此我们称之为硬绑定。  
 
-硬绑定的典型应用场景就是创建一个包裹函数，传入所有的参数并返回接收到的所有值：  
+由于硬绑定是一种非常常用的模式，所以在 ES5 中提供了内置的方法 Function.prototype.
+bind，它的用法如下：  
+```js
+function foo(something) {
+  console.log(this.a, something)
+  return this.a + something
+}
+var obj = {
+  a: 2,
+}
+var bar = foo.bind(obj)
+var b = bar(3) // 2 3
+console.log(b) // 5
+```
+bind(..) 会返回一个硬编码的新函数，它会把参数设置为 this 的上下文并调用原始函数。  
+
+
+
+##### new绑定
+然而，JavaScript 中 new 的机制实际上和面向类的语言完全不同。 **JavaScript 中，构造函数只是一些使用 new 操作符时被调用的函数。**。它们并不会属于某个类，也不会实例化一个类。实际上，它们甚至都不能说是一种特殊的函数类型，它们只是被 new 操作符调用的普通函数而已。  
+**包括内置对象函数（比如 Number(..)）在内的所有函数都可以用 new 来调用，这种函数调用被称为构造函数调用。**
+**注意：** 实际上并不存在所谓的“构造函数”，只有对于函数的“构造调用”。  
+
+使用 new 来调用函数，或者说发生构造函数调用时，会自动执行下面的操作。
+- 1. 创建（或者说构造）一个全新的对象。
+- 2. 这个新对象会被执行 [[ 原型 ]] 连接。
+- 3. 这个新对象会绑定到函数调用的 this。
+- 4. 如果函数没有返回其他对象，那么 new 表达式中的函数调用会自动返回这个新对象。  
+
+例如：  
+```js
+function foo(a) {
+  this.a = a;
+}
+var bar = new foo(2);
+console.log( bar.a ); // 2
+```
+使用 new 来调用 foo(..) 时，我们会构造一个新对象并把它绑定到 foo(..) 调用中的 this上。new 是最后一种可以影响函数调用时 this 绑定行为的方法，我们称之为 new 绑定。  
+
+
+#### this 绑定优先级
+默认绑定的优先级是四条规则中最低的，显式绑定优先级更高，也就是说在判断时应当先考虑是否可以应用显式绑定。  
+所以现在需要思考🤔的是： new 绑定和隐式绑定的优先级。
+```js
+function foo(something) {
+  this.a = something
+}
+var obj1 = {
+  foo: foo,
+}
+var obj2 = {}
+obj1.foo(2)
+console.log(obj1.a) // 2
+obj1.foo.call(obj2, 3)
+console.log(obj2.a) // 3
+var bar = new obj1.foo(4)
+console.log(obj1.a) // 2
+console.log(bar.a) // 4
+```
+可以看到 new 绑定比隐式绑定优先级高。但是 new 绑定和显式绑定谁的优先级更高呢？  
+
+```js
+function foo(something) {
+  this.a = something
+}
+var obj1 = {}
+var bar = foo.bind(obj1)
+bar(2) // bar 调用，实际上是调用 foo，此时 foo 永久指向 obj1
+console.log(obj1.a) // 2
+var baz = new bar(3) // 通过对永久this指向的 bar 进行 new 调用，this 指向创建的实例。
+console.log(obj1.a) // 2
+console.log(baz.a) // 3
+```
+再来看看我们之前介绍的“裸”辅助函数 bind：  
+```js
+function bind(fn, obj) {
+  // 这儿 return 的函数就是 baz
+  return function () {
+    fn.apply(obj, arguments)
+  }
+}
+```
+非常令人惊讶，因为看起来在辅助函数中 new 操作符的调用无法修改 this 绑定，但是在刚才的代码中 new 确实修改了 this 绑定。  
+
+#### 如何判断
+- 1. 函数是否在 new 中调用（new 绑定）？如果是的话 this 绑定的是新创建的对象。var bar = new foo()
+- 2. 函数是否通过 call、apply（显式绑定）或者硬绑定调用？如果是的话，this 绑定的是指定的对象。var bar = foo.call(obj2)
+- 3. 函数是否在某个上下文对象中调用（隐式绑定）？如果是的话，this 绑定的是那个上下文对象。var bar = obj1.foo()
+- 4. 如果都不是的话，使用默认绑定。如果在严格模式下，就绑定到 undefined，否则绑定到全局对象。var bar = foo()
+
+不过……凡事总有例外。  
+
+#### 绑定例外
+在某些场景下 this 的绑定行为会出乎意料。
+**被忽略的this**  
+如果你把 null 或者 undefined 作为 this 的绑定对象传入 call、apply 或者 bind，这些值在调用时会被忽略，实际应用的是默认绑定规则：
+```js
+function foo() {
+  console.log(this.a)
+}
+var a = 2
+foo.call(null) // 2
+```
+
+
+**更安全的this绑定**  
+一种“更安全”的做法是传入一个特殊的对象，把 this 绑定到这个对象不会对你的程序产生任何副作用。  
+如果我们在忽略 this 绑定时总是传入一个 DMZ 对象，那就什么都不用担心了，因为任何对于 this 的使用都会被限制在这个空对象中，不会对全局对象产生任何影响。**在 JavaScript 中创建一个空对象最简单的方法都是 Object.create(null)**
+```js
+function safeFunction() {
+  console.log(this.foo); // 访问 this.foo
+}
+
+const safeObject = Object.create(null);
+safeObject.foo = "Safe binding";
+
+safeFunction.call(safeObject); // 输出 "Safe binding"
+
+// 即使没有 foo 属性，调用也不会影响全局对象
+safeFunction.call(Object.create(null)); // 输出 undefined
+```
+
+
+```js
+function test() {
+  console.log(this) // 输出 this 的引用
+}
+
+// 默认情况下，传入 null 时 this 会指向全局对象
+test.call(null) // 在浏览器中输出 window 对象，在 Node.js 中输出 global
+```
+如果程序不小心误用 this 来修改全局对象，会导致难以预料的副作用。
+
+
+##### 间接引用
+间接引用最容易在赋值时发生：  
+```js
+function foo() {
+  console.log(this.a)
+}
+var a = 2
+var o = { a: 3, foo: foo }
+var p = { a: 4 }
+o.foo(); // 3
+// 赋值表达式加立即调用
+(p.foo = o.foo)(); // 2
+```
+当使用赋值表达式（如 p.foo = o.foo）时，只是将函数的引用赋值给 p.foo，而并未保留 o 的隐式绑定关系。结果：this 将不再指向 o，而是根据调用方式重新决定。(p.foo = o.foo)() 是一个独立调用，因此 this 指向全局对象。
+
+
+#### this 词法
+我们之前介绍的四条规则已经可以包含所有正常的函数。但是 ES6 中介绍了一种无法使用这些规则的特殊函数类型：箭头函数。  
+
+箭头函数并不是使用 function 关键字定义的，而是使用被称为“胖箭头”的操作符 => 定义的。箭头函数不使用 this 的四种标准规则，而是根据外层（函数或者全局）作用域来决定 this。  
+```js
+function foo() {
+  // 返回一个箭头函数
+  return a => {
+    //this 继承自 foo()
+    console.log(this.a)
+  }
+}
+var obj1 = {
+  a: 2,
+}
+var obj2 = {
+  a: 3,
+}
+var bar = foo.call(obj1)
+bar.call(obj2) // 2，箭头函数的绑定无法被修改。
+```
+foo() 的 this 绑定到 obj1，bar 是 foo return 的箭头函数，箭头函数没有自己的 this ，故而 bar 中的 this 实际上是 foo 的 this，箭头函数的绑定无法被修改，new 也不行（它的this是基于上层作用域的， 除非上层作用域this被修改）！所以箭头函数不能被 new 调用。  
+
+箭头函数最常用于回调函数中，例如事件处理器或者定时器：  
+```js
+function foo() {
+  setTimeout(() => {
+    // 继承自 foo() 的this
+    console.log(this.a)
+  }, 100)
+}
+var obj = {
+  a: 2,
+}
+foo.call(obj) // 2
+```
+es6之前模拟箭头函数的方案
+```js
+function foo() {
+  var self = this // lexical capture of this
+  setTimeout(function () {
+    console.log(self.a)
+  }, 100)
+}
+var obj = {
+  a: 2,
+}
+foo.call(obj) // 2
+```
+
+## 对象
+对象可以通过两种形式定义：字面量和构造函数声明。构造形式和文字形式生成的对象是一样的。唯一的区别是，在文字声明中你可以添加多个键 / 值对，但是在构造形式中你必须逐个添加属性。  
+
+函数就是对象的一个子类型（从技术角度来说就是“可调用的对象”）。JavaScript 中的函数是“一等公民”，因为它们本质上和普通的对象一样（只是可以调用），所以可以像操作其他对象一样操作函数（比如当作另一个函数的参数）。  
+
+数组也是对象的一种类型，具备一些额外的行为。数组中内容的组织方式比一般的对象要稍微复杂一些。  
+
+**JavaScript 中的函数是“一等公民”**  
+这意味着函数在语言中被视为与其他数据类型（如字符串、数字、对象等）同等重要的实体，可以像普通变量一样自由使用。  
+1. 函数可以作为值赋给变量  
+2. 函数可以作为参数传递  
+3. 函数可以作为返回值  
+4. 函数可以存储在数据结构中  
+5. 支持匿名函数  
+
+这些特性使得 JavaScript 函数非常灵活，能够支持函数式编程范式，增强代码的复用性和可扩展性。
+
+
+### 内置对象
+JavaScript 中还有一些对象子类型，通常被称为内置对象。  
+• String
+• Number
+• Boolean
+• Object
+• Function
+• Array
+• Date
+• RegExp
+• Error
+
+这些内置对象从表现形式来说很像其他语言中的类型（type）或者类（class），比如 Java中的 String 类。  
+但是在 JavaScript 中，它们实际上只是一些内置函数。这些内置函数可以当作构造函数（由 new 产生的函数调用）来使用，从而可以构造一个对应子类型的新对象。  
+```js
+var strPrimitive = "I am a string"
+console.log(typeof strPrimitive) // "string"
+console.log(strPrimitive instanceof String) // false
+
+var strObject = new String("I am a string")
+console.log(typeof strObject) // "object"
+console.log(strObject instanceof String) // true
+
+// 检查 sub-type 对象
+console.log(Object.prototype.toString.call(strObject)) // [object String]
+```
+
+原始值 "I am a string" 并不是一个对象，它只是一个字面量，并且是一个不可变的值。**如果要在这个字面量上执行一些操作，比如获取长度、访问其中某个字符等，那需要将其转换为 String 对象。**  当需要时 js 引擎会自动将字面量转化为对应的对象。  
+
+null 和 undefined 不能通过构造的方式去声明，只能通过字面量的方式去声明。  
+
+Error 对象很少在代码中显式创建，一般是在抛出异常时被自动创建。也可以使用 newError(..) 这种构造形式来创建，不过一般来说用不着。
+
+##### 属性
+属性其实就是对象的内容，在写法层面我们将一个对象的所有属性全部写在一起，用一个块进行包裹，在引擎内部，这些值的存储方式是多种多样的，一般并不会存在对象容器内部，存储在对象容器内部的是这些属性的引用，并指向他们真正存储的位置。  
+
+**注意：**在对象中，属性名永远都是字符串。如果你使用 string（字面量）以外的其他值作为属性名，那它首先会被转换为一个字符串。即使是数组也不例外。  
+
+
+##### 可计算属性名
+ES6 增加了可计算属性名，可以在文字形式中使用 [] 包裹一个表达式来当作属性名：
+```js
+var prefix = "foo"
+var myObject = {
+  [prefix + "bar"]: "hello",
+  [prefix + "baz"]: "world",
+}
+console.log(myObject["foobar"]) // hello
+console.log(myObject["foobaz"]) // world
+```
+
+可计算属性名最常用的场景可能是 ES6 的符号（Symbol）,它们是一种新的基础数据类型，包含一个不透明且无法预测的值(从技术就是一个字符串)
+
+
+##### 属性与方法
+对象属性是一个函数，我们习惯称之为方法。  
+ES6 增加了 super 引用，一般来说会被用在 class 中，super的行为似乎更有理由把 super 绑定的函数称为“方法”。
+
+
+##### 数组
+数组也是对象，数组下标就是对象的键，数组元素就是对象键对应的值。  
+深入解析：数组下标的本质  
+数组的索引是对象的字符串键，你访问 array[0] 时，0 会被隐式转换为字符串 '0'，然后用作对象的键。
+```js
+const arr = ['a', 'b', 'c'];
+console.log(arr[0]);         // 'a'
+console.log(arr['0']);       // 'a'
+console.log(typeof '0');     // 'string'
+console.log(typeof 0);       // 'number'
+```
+
+
+**数组非整数的键**  
+数组也可以拥有非整数的键，但这些键不会被计入 length，它们会被视为对象的普通属性。
+```js
+const arr = []
+arr[3] = "a" // 索引为 1 的元素
+arr["foo"] = "bar" // 添加了一个普通属性
+console.log(arr) // [ <1 empty item>, 'a', foo: 'bar' ]
+console.log(arr.length) // 输出 2（只统计整数索引的最大值 + 1）
+```
+
+**数组和普通对象的主要区别**  
+- 索引是整数值的字符串键：数组的索引通常是 0 到 length-1 的正整数（底层还是转化为字符串）。
+- length 属性：数组自动维护一个 length 属性，表示数组的元素个数。**只要数组的索引是非负整数并且有更新时，length 属性会自动更新。**
+- 原型链支持数组方法：数组继承了很多数组特定的方法（如 push、pop、map 等）。
+
+##### 复制对象
+js中的拷贝分为浅拷贝和深拷贝，浅拷贝多个对象共享相同属性，深拷贝相当于创建一个新的对象，和原对象间互不影响。
+
+举个深拷贝的例子：
+```js
+var newObj = JSON.parse( JSON.stringify( someObj ) )
+```
+实现原理：  
+1. JSON.stringify：将对象转换为 JSON 字符串。  
+在这个过程中，所有可枚举的属性（包括嵌套对象）都会被转换为 JSON 格式，成为一个独立的字符串。
+```js
+const obj = { a: 1, b: { c: 2 } };
+const jsonStr = JSON.stringify(obj);
+console.log(jsonStr); // 输出 '{"a":1,"b":{"c":2}}'
+```
+
+2. JSON.parse：将 JSON 字符串解析为新对象，解析过程中会创建新的对象和子对象，形成一个完全独立的深拷贝。
+```js
+const newObj = JSON.parse('{"a":1,"b":{"c":2}}');
+console.log(newObj); // 输出 { a: 1, b: { c: 2 } }
+```
+
+优点：  
+实现深拷贝：能够递归复制对象，包括嵌套的子对象。
+简单易用：仅需一行代码，适用于大部分普通对象的场景。
+去掉非 JSON 表示的属性：可以自动过滤掉 undefined、函数、Symbol 等无法表示的属性。
+
+缺点：  
+无法拷贝特殊对象类型
+- 无法处理 Date 对象，会被序列化为字符串：  
+```js
+const obj = { date: new Date() };
+const copy = JSON.parse(JSON.stringify(obj));
+console.log(copy.date); // 输出字符串，例如 "2024-01-01T00:00:00.000Z"
+```
+- 无法处理 RegExp 对象，会丢失为普通对象。
+- 无法处理 Map 和 Set，会丢失结构。
+```js
+const obj = { map: new Map([[1, 'one']]) };
+const copy = JSON.parse(JSON.stringify(obj));
+console.log(copy.map); // 输出 undefined
+```
+- 如果对象中存在循环引用，会导致 JSON.stringify 抛出错误
+```js
+const obj = {};
+obj.self = obj; // 循环引用
+JSON.stringify(obj); // 抛出 TypeError: Converting circular structure to JSON
+```
+
+
+##### 属性描述符
+在 ES5 之前，JavaScript 语言本身并没有提供可以直接检测**属性特性**的方法，比如判断属性是否是只读。但是从 ES5 开始，所有的属性都具备了属性描述符。  
+```js
+var myObject = {
+  a: 2,
+}
+console.log(Object.getOwnPropertyDescriptor(myObject, "a"))
+// {
+// value: 2,
+// writable: true,
+// enumerable: true,
+// configurable: true
+// }
+```
+这个普通的对象属性对应的属性描述符（也被称为“数据描述符”，因为它只保存一个数据值）可不仅仅只是一个 2。它还包含另外三个特性：writable（可写）、enumerable（可枚举）和 configurable（可配置）。
+
+##### 不变性
+很重要的一点是，**所有的方法创建的都是浅不变形，也就是说，它们只会影响目标对象和它的直接属性。**如果目标对象引用了其他对象（数组、对象、函数，等），其他对象的内容不受影响，仍然是可变的。  
+
+- 常量属性：结合 writable:false 和 configurable:false 就可以创建一个真正的常量属性（不可修改、
+重定义或者删除）。
+```js
+var myObject = {};
+Object.defineProperty( myObject, "FAVORITE_NUMBER", {
+  value: 42,
+  writable: false,
+  configurable: false
+} );
+```
+- 禁止扩展: 禁 止 一 个 对 象 添 加 新 属 性 并 且 保 留 已 有 属 性， 可 以 使 用 Object.prevent.Extensions(..)
+```js
+var myObject = {
+  a: 2,
+}
+Object.preventExtensions(myObject)
+myObject.b = 3
+console.log(myObject.b) // undefined
+```
+
+- 密封：Object.seal(..) 会创建一个“密封”的对象，这个方法实际上会在一个现有对象上调用 Object.preventExtensions(..) 并把所有现有属性标记为 configurable:false。 所以，密封之后不仅不能添加新属性，也不能重新配置或者删除任何现有属性（虽然可以修改属性的值）。
+
+- 冻结：Object.freeze(..) 会创建一个冻结对象，这个方法实际上会在一个现有对象上调用Object.seal(..) 并把所有“数据访问”属性标记为 writable:false，这样就无法修改它们的值。  
+
+**这个方法是你可以应用在对象上的级别最高的不可变性，它会禁止对于对象本身及其任意直接属性的修改（不过就像我们之前说过的，这个对象引用的其他对象是不受影响的）**  
+
+
+##### [[Get]] 和 [[Put]]
+在 JavaScript 中，[[Get]] 和 [[Put]] 是对象的内部方法（internal methods），它们是 ECMAScript 规范中定义的抽象操作，用于描述对象如何获取和设置属性的行为,然这些内部方法是规范层面的概念，开发者无法直接访问它们，但它们是 . 操作符、[] 操作符以及一些内置方法背后的机制。  
+
+[[Get]] 是对象用于获取属性值的内部操作，它描述了当尝试访问对象的属性时发生的事情（比如 obj.prop 或 obj['prop']）。
+```js
+var myObject = {
+  a: 2
+};
+myObject.a; // 2
+```
+**myObject.a 能实现属性的访问，实际上是通过对象中实现的 [[Get]] 操作完成的**。对象默认的内置 [[Get]] 操作首先在对象中查找是否有名称相同的属性，如果找到就会返回这个属性的值。如果没有找到名称相同的属性，按照 [[Get]] 算法的定义会执行另外一种非常重要的行为，在后面会讲到（其实就是原型链查找），如果在原型链上还是没有找到 那 [[Get]] 操作会返回值 undefined。  
+
+[[Get]] 是对象用于获取属性值的内部操作，它描述了当尝试访问对象的属性时发生的事情（比如 obj.prop 或 obj['prop']）。
+
+工作流程
+- 如果该属性存在并且是一个数据属性（data property），返回其值。
+- 如果该属性存在并且是一个访问器属性（accessor property），调用该属性的 get 方法（如果有）。
+- 如果该属性不存在：
+  - 查找原型链上的属性。
+  - 如果整个原型链中都找不到，返回 undefined。
+```js
+const obj = {
+  a: 10,
+  get b() {
+    return this.a * 2;
+  }
+};
+
+console.log(obj.a); // 10，直接返回值
+console.log(obj.b); // 20，调用访问器属性的 getter
+console.log(obj.c); // undefined，属性不存在
+```
+
+[[Put]] 是对象用于设置属性值的内部操作，它描述了当尝试给对象的属性赋值时发生的事情（比如 obj.prop = value 或 obj['prop'] = value）。  
+
+工作流程
+- 如果该属性存在并且是一个数据属性（data property），则更新其值（如果属性是可写的）。
+- 如果该属性存在并且是一个访问器属性（accessor property），调用其 set 方法（如果有）。
+- 如果该属性不存在：
+  - 如果对象是可扩展的（extensible），创建一个新属性并赋值。
+  - 如果对象不可扩展，则忽略赋值操作或抛出错误（在严格模式下）。
+
+```js
+const obj = {
+  a: 10,
+  set b(value) {
+    this.a = value / 2;
+  }
+};
+
+obj.a = 20; // 修改已有的属性
+console.log(obj.a); // 20
+
+obj.b = 40; // 调用访问器属性的 setter
+console.log(obj.a); // 20，因为 b 的 setter 修改了 a
+
+obj.c = 30; // 创建一个新属性
+console.log(obj.c); // 30
+```
+
+总结：
+- [[Get]] 和 [[Put]] 是规范中的抽象操作，用于定义对象如何读取和写入属性。
+- 它们受制于属性描述符（Property Descriptor）系统，尤其是可写性（writable）、访问器（getter/setter）以及原型链等机制的影响。
+- 开发者实际编写代码时，通过标准操作符（如 . 和 []）间接使用了这些内部方法。
+
+##### Getter和Setter
+对象默认的 [[Put]] 和 [[Get]] 操作分别可以控制属性值的设置和获取。  
+在 ES5 中可以使用 getter 和 setter 部分改写默认操作，**但是只能应用在单个属性上，无法应用在整个对象上。** getter 是一个隐藏函数，会在获取属性值时调用。setter 也是一个隐藏函数，会在设置属性值时调用。  
+**定义与作用**
+Getter（取值器）
+- 在读取属性值时执行逻辑。
+- 通过关键字 get 定义。
+- 无需调用，直接通过属性访问即可触发。
+
+**Setter（赋值器）**
+- 在设置属性值时执行逻辑。
+- 通过关键字 set 定义。
+- 接收一个参数，该参数表示要赋的值。  
+
+
+当你给一个属性定义 getter、setter 或者两者都有时，这个属性会被定义为“访问描述符”（和“数据描述符”相对）。对于访问描述符来说，JavaScript 会忽略它们的 value 和 writable 特性，取而代之的是关心 set 和 get（还有 configurable 和 enumerable）特性。  
+
+```js
+var myObject = {
+  // 给 a 定义一个 getter
+  get a() {
+    return 2
+  },
+}
+Object.defineProperty(
+  myObject, // 目标对象
+  "b", // 属性名{
+  // 描述符
+  // 给 b 设置一个 getter
+  {
+    get: function () {
+      return this.a * 2
+    },
+    // 确保 b 会出现在对象的属性列表中
+    enumerable: true,
+  }
+)
+myObject.a // 2
+myObject.b // 4
+```
+
+**不管是对象文字语法中的 get a() { .. }，还是 defineProperty(..) 中的显式定义，二者都会在对象中创建一个不包含值的属性，对于这个属性的访问会自动调用一个隐藏函数，它的返回值会被当作属性访问的返回值**  所以定对象的属性可以用键值对或者getter的方式。  
+
+```js
+var myObject = {
+  // 给 a 定义一个 getter
+  get a() {
+    return 2
+  },
+}
+myObject.a = 3
+console.log(myObject.a) // 2
+```
+上述代码定义了 a 的 getter，没有定义 setter ，所以对 a 的值进行设置时 set 操作会忽略赋值操作。**而且即便有合法的 setter，由于我们自定义的 getter 只会返回 2，所以 set 操作是没有意义的。**  
+
+为了让属性更合理，还应当定义 setter，和你期望的一样，**setter 会覆盖单个属性默认的[[Put]]（也被称为赋值）操作**。通常来说 getter 和 setter 是成对出现的（只定义一个的话通常会产生意料之外的行为）  
+**改进**  
+```js
+const myObject = {
+  // 内部存储的属性
+  _a: 2,
+
+  // 定义 getter
+  get a() {
+    return this._a // 从内部存储中获取值
+  },
+
+  // 定义 setter
+  set a(value) {
+    this._a = value // 更新内部存储的值
+  },
+}
+
+myObject.a = 3 // 使用 setter 设置值
+console.log(myObject.a) // 3，使用 getter 获取值
+```
+
+##### 存在性
+前面我们介绍过，如 myObject.a 的属性访问返回值可能是 undefined，但是这个值有可能是属性中存储的 undefined，也可能是因为属性不存在所以返回 undefined。那么如何区分这两种情况呢？  
+
+我们可以在不访问属性值的情况下判断对象中是否存在这个属性：  
+```js
+var myObject = {
+  a: 2,
+}
+"a" in myObject // true
+"b" in myObject // false
+console.log(myObject.hasOwnProperty("a")) // true
+console.log(myObject.hasOwnProperty("b")) // false
+```
+**in 操作符会检查属性是否在对象及其 [[Prototype]] 原型链中。相比之下，hasOwnProperty(..) 只会检查属性是否在 myObject 对象中，不会检查[[Prototype]] 链。**
+
+怎么判断对象中是否存在某属性。  
+1. in 操作符检查属性是否存在于对象及其原型链中。  
+```js
+const obj = { a: 1 };
+console.log('a' in obj); // true
+console.log('b' in obj); // false
+
+// 原型链上的属性
+console.log('toString' in obj); // true
+```
+优点：
+- 能检查对象自身的属性，也能检查继承的属性。
+- 适合需要判断包括原型链属性在内的场景。
+缺点：
+- 如果只需要判断对象自身属性（不包括原型链），需搭配其他方法。
+
+2. 使用 hasOwnProperty 方法
+hasOwnProperty 只检查对象自身的属性，不检查原型链上的属性。
+```js
+const obj = { a: 1 };
+console.log(obj.hasOwnProperty('a')); // true
+console.log(obj.hasOwnProperty('b')); // false
+
+// 原型链上的属性
+console.log(obj.hasOwnProperty('toString')); // false
+```
+优点：
+- 精确检查对象自身的属性。
+- 避免误判原型链上的属性。
+缺点：
+- 是对象的方法，不能直接用于可能是 null 或非对象的变量。
+- 如果对象被覆盖了自定义的 hasOwnProperty 方法，需要使用 Object.prototype.hasOwnProperty.call。
+
+
+3. 使用 Object.prototype.hasOwnProperty.call  
+相当于在原型链顶层调用 hasOwnProperty 避免自定义属性覆盖，是 hasOwnProperty 安全调用方法。
+```js
+const obj = { a: 1, hasOwnProperty: 'custom' };
+console.log(Object.prototype.hasOwnProperty.call(obj, 'a')); // true
+console.log(Object.prototype.hasOwnProperty.call(obj, 'b')); // false
+console.log(Object.prototype.hasOwnProperty.call(obj, 'hasOwnProperty')); // true
+```
+
+4. 使用 Object.keys 或 Object.getOwnPropertyNames  
+```js
+const obj = { a: 1, b: undefined };
+console.log(Object.keys(obj).includes('a')); // true
+console.log(Object.keys(obj).includes('b')); // true
+console.log(Object.keys(obj).includes('c')); // false
+```
+
+优点：精确判断对象自身的属性。
+缺点：
+- 需要遍历对象，性能相对较低。
+- 不检查原型链上的属性。
+
+
+##### 迭代
+ES5 中增加了一些数组的辅助迭代器，包括 forEach(..)、every(..) 和 some(..)。
+1. forEach: forEach() 是一个用于数组遍历的常用方法，它对数组的每个元素执行一个提供的回调函数。  
+- 返回值：forEach() 没有返回值，返回 undefined。
+- 遍历：遍历数组中的每个元素。
+- 可中止性：无法通过 break 或 return 中途退出迭代。
+- 适用场景：适合用于执行副作用操作（例如打印、修改外部变量等），不适合用于需要获取布尔结果的场景。
+
+2. every: every() 用于测试数组中的所有元素是否都满足指定的条件。如果数组中的所有元素都通过测试，则返回 true，否则返回 false。  
+- 返回值：返回一个布尔值，表示是否所有元素都满足条件。
+- 遍历：遍历数组元素，直到发现第一个不符合条件的元素时停止。
+- 可中止性：every() 在遇到第一个返回 false 的元素时停止遍历，剩余元素不再遍历。
+- 适用场景：用于判断是否所有元素满足某个条件，例如检查数组中的所有数字是否都大于零。
+
+3. some: some() 用于测试数组中是否至少有一个元素满足指定的条件。如果数组中有一个元素通过了测试，some() 返回 true，否则返回 false。  
+- 返回值：返回一个布尔值，表示是否有任意一个元素满足条件。
+- 遍历：遍历数组元素，直到发现第一个符合条件的元素时停止。
+- 可中止性：some() 在遇到第一个返回 true 的元素时停止遍历，剩余元素不再遍历。
+- 适用场景：用于检查是否有元素满足某个条件，例如判断数组中是否有负数。
+
+
+**使用 for..in 遍历对象是无法直接获取属性值的，因为它实际上遍历的是对象中的所有可枚举属性，你需要手动获取属性值。**  
+**直接遍历值而不是数组下标（或者对象属性）呢？幸好，ES6 增加了一种用来遍历数组的 for..of 循环语法。**  
+**for..of 循环首先会向被访问对象请求一个迭代器对象，然后通过调用迭代器对象的next() 方法来遍历所有返回值。数组有内置的 @@iterator，因此 for..of 可以直接应用在数组上。**  
+调用迭代器的 next() 方法会返回形式为 { value: .. , done: .. } 的值，value 是当前的遍历值，done 是一个布尔值，表示是否还有值可以遍历。  
+
+普通的对象没有内置的 @@iterator，所以无法自动完成 for..of 遍历。所以 for..of 一般用于遍历数组，for..in 一般用于遍历对象。
+```js
+for (const key in object) {
+  if (Object.prototype.hasOwnProperty.call(object, key)) {
+    const element = object[key];
+    
+  }
+}
+
+for (const element of object) {
+  
+}
+```
+
+**迭代器**  
+在 JavaScript 中，迭代器（Iterator） 是一种允许我们遍历数据集合（如数组、对象、字符串等）的对象。迭代器遵循一种统一的协议，通过 next() 方法返回序列中的每一项，直到序列的末尾。  
+
+**1. 迭代器（Iterator）协议**  
+迭代器是一种对象，它实现了一个特定的协议。这个协议要求对象必须具有一个 next() 方法，该方法返回一个对象，这个对象必须包含两个属性：
+value：表示当前项的值。
+done：表示是否已经迭代到集合的末尾。如果迭代器已经遍历完所有元素，done 的值是 true，否则是 false。
+```js
+const iterator = {
+  next: function() {
+    return {
+      value: '当前值',
+      done: false // 或 true，表示是否已完成迭代
+    };
+  }
+};
+```
+
+**2. 对象的迭代：如何迭代对象的属性**  
+**JavaScript 中的对象并没有内建的迭代器，但是通过一些内建的方法，我们可以实现对对象属性的迭代。**  
+对象本身并不是可迭代的（不像数组那样直接支持 for...of 循环），但是可以通过对象的一些方法（如 Object.keys(), Object.values(), Object.entries()）来实现属性的迭代。  
+
+常见的迭代方法：
+- Object.keys()：返回一个包含对象所有属性名（键）的数组。
+- Object.values()：返回一个包含对象所有属性值的数组。
+- Object.entries()：返回一个包含对象所有键值对的数组，每个元素是一个二元数组，格式为 [key, value]。
+**这些方法本质上会将对象的属性转换成一个数组，然后我们可以使用数组的迭代器来遍历这些属性。**
+
+**3. 对象的属性迭代**
+for...in 循环是 JavaScript 中专门用于遍历对象属性的方法，它会遍历对象的所有可枚举属性，包括原型链上的属性（如果不想遍历原型链的属性，可以使用 hasOwnProperty()）。
+
+
+**4. 自定义对象的迭代**  
+如果你希望你的对象可以像数组一样使用 for...of 进行迭代，可以通过定义迭代器（Symbol.iterator）来实现。Symbol.iterator 是一个特殊的方法，定义了如何遍历对象。
+```js
+const myObject = {
+  a: 1,
+  b: 2,
+  c: 3,
+
+  // 定义 Symbol.iterator 方法
+  [Symbol.iterator]: function() {
+    const keys = Object.keys(this);
+    let index = 0;
+    const self = this;
+
+    return {
+      next: function() {
+        if (index < keys.length) {
+          const key = keys[index++];
+          return { value: [key, self[key]], done: false };
+        } else {
+          return { done: true };
+        }
+      }
+    };
+  }
+};
+
+for (let [key, value] of myObject) {
+  console.log(key, value);
+}
+// Output:
+// a 1
+// b 2
+// c 3
+```
+
+## 混合对象“类”
