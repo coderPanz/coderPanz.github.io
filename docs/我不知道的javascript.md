@@ -1433,3 +1433,275 @@ for (let [key, value] of myObject) {
 ```
 
 ## 混合对象“类”
+在相当长的一段时间里，JavaScript 只有一些近似类的语法元素（比如 new 和 instanceof），不过在后来的 ES6 中新增了一些元素，比如 class 关键字。
+这是不是意味着 JavaScript 中实际上有类呢？简单来说：不是。  
+
+什么是类？  
+一个类就是一张蓝图。为了获得真正可以交互的对象，我们必须按照类来建造（也可以说实例化）一个东西，这个东西通常被称为实例，有需要的话，我们可以直接在实例上调用方法并访问其所有公有数据属性。这个对象就是类中描述的所有特性的一份副本。  
+
+
+### 面向对象编程（OOP）
+面向对象编程是一种编程范式，它使用“对象”来表示数据和操作这些数据的行为。OOP 的核心概念围绕着封装、继承、多态和抽象展开，这些概念使得程序设计更加模块化、可扩展和易维护。  
+
+OOP 的四大核心概念  
+**1. 封装**
+封装是面向对象编程的基础，它指的是将数据（属性）和操作数据的方法（行为）封装成一个单一的单元，即对象。
+- 数据隐藏：对象内部的实现细节对外界隐藏，确保数据的一致性和完整性，避免外部程序直接修改对象的内部状态。  
+- 接口：提供给外界使用的公共方法，用来访问和修改对象的内部数据。
+```js
+class BankAccount {
+  constructor(balance) {
+    let _balance = balance;  // 私有属性
+
+    // 公共方法，提供访问和修改余额的接口
+    this.getBalance = function() {
+      return _balance;
+    };
+
+    this.deposit = function(amount) {
+      if (amount > 0) {
+        _balance += amount;
+      }
+    };
+
+    this.withdraw = function(amount) {
+      if (amount > 0 && _balance >= amount) {
+        _balance -= amount;
+      }
+    };
+  }
+}
+
+const account = new BankAccount(1000);
+console.log(account.getBalance()); // 1000
+account.deposit(500);
+console.log(account.getBalance()); // 1500
+account.withdraw(200);
+console.log(account.getBalance()); // 1300
+// 直接访问 _balance 会导致错误，因为 _balance 是私有的
+// console.log(account._balance); // undefined
+```
+在上面的例子中，_balance 是私有的，外部不能直接访问，所有对余额的操作都必须通过提供的 deposit 和 withdraw 方法。  
+
+**2. 继承（Inheritance）**  
+继承是指子类可以继承父类的属性和方法，从而实现代码的重用, 继承关系使得子类不仅能访问父类的方法和属性，还能覆盖（重写）父类的方法，以实现定制化的行为。
+- 单继承：大多数语言（如 JavaScript、Java）只支持单继承，即一个类只能继承一个父类。
+- 多继承：一些语言（如 Python）支持多继承，允许一个类继承多个父类。
+
+```js
+class Animal {
+  constructor(name) {
+    this.name = name;
+  }
+
+  speak() {
+    console.log(`${this.name} makes a sound`);
+  }
+}
+
+class Dog extends Animal { // Dog 继承 Animal
+  speak() {
+    console.log(`${this.name} barks`);
+  }
+}
+
+const dog = new Dog('Buddy');
+dog.speak();  // 输出：Buddy barks
+```
+在上面的代码中，Dog 继承了 Animal 类，Dog 类重写了 speak 方法。
+
+
+**3. 多态（Polymorphism）**
+多态指的是同一操作在不同对象上的表现不同。通过继承和方法重写（或重载），子类可以有自己的实现，从而实现多态。多态使得相同的方法能够作用于不同的对象，不同对象根据其自身的类型表现出不同的行为。  
+- 方法重写（Override）：子类可以重写父类的方法，以便为该方法提供不同的实现。
+- 接口多态：不同的类实现相同的接口，但每个类的实现方式可以不同。
+
+```js
+class Animal {
+  speak() {
+    console.log("Animal makes a sound");
+  }
+}
+
+class Dog extends Animal {
+  speak() {
+    console.log("Dog barks");
+  }
+}
+
+class Cat extends Animal {
+  speak() {
+    console.log("Cat meows");
+  }
+}
+
+const animals = [new Dog(), new Cat(), new Animal()];
+animals.forEach(animal => animal.speak());
+// 输出：
+// Dog barks
+// Cat meows
+// Animal makes a sound
+```
+在这个例子中，Dog 和 Cat 类都继承了 Animal 类，并重写了 speak 方法。尽管 animals 数组中存储的是不同类型的对象，但它们都通过调用 speak() 方法展示了各自的行为，这就是多态的体现。  
+
+
+**4. 抽象（Abstraction）**
+抽象是指从复杂的现实世界中提取出关键的特征，将不重要的细节忽略。它通过将对象的具体实现和外部的使用区分开，帮助开发者关注问题的高层次解决方案。抽象可以通过抽象类、接口等实现，旨在简化复杂的系统设计。
+```js
+class Shape {
+  // 抽象方法（没有实现）
+  area() {
+    throw new Error("Method 'area()' must be implemented.");
+  }
+}
+
+class Circle extends Shape {
+  constructor(radius) {
+    super();
+    this.radius = radius;
+  }
+
+  // 实现抽象方法
+  area() {
+    return Math.PI * this.radius * this.radius;
+  }
+}
+
+const circle = new Circle(5);
+console.log(circle.area());  // 输出：78.53981633974483
+```
+在这个例子中，Shape 类是一个抽象类，它定义了一个抽象方法 area()，但没有提供具体的实现，子类 Circle 必须实现 area() 方法。
+
+面向对象编程（OOP）的四大核心概念：
+
+封装：将数据和操作数据的行为封装在一起，并隐藏实现细节，暴露必要的接口。
+继承：通过继承使得子类能够重用父类的属性和方法，并根据需要进行扩展或修改。
+多态：允许不同对象响应相同方法调用，根据对象的实际类型做出不同的行为。
+抽象：通过抽象类或接口定义对象的基本行为规范，而不关心具体的实现细节，简化系统设计。
+
+
+### 混入
+在继承或者实例化时，JavaScript 的对象机制并不会自动执行复制行为。简单来说，JavaScript 中只有对象，并不存在可以被实例化的“类”。一个对象并不会被复制到其他对象，它们会被关联起来由于在其他语言中类表现出来的都是复制行为，因此 JavaScript 开发者也想出了一个方法来模拟类的复制行为，这个方法就是入。  
+
+混入（Mixin） 是一种通过将功能性代码块从一个对象或类“混入”到另一个对象或类中的技术。这种方法并不涉及继承，而是通过将一组功能性的方法或属性直接添加到一个类或对象中来增强它的能力，混入并不是 JavaScript 语言本身的一部分，而是一种模式。  
+
+基本概念：核心思想是将一些独立的功能模块（可以是对象或类）合并到其他对象或类中，从而避免使用继承机制过多地依赖父类。
+
+优点：
+ -代码复用：可以把常用的功能提取到混入对象中，避免代码重复。
+- 灵活性：相比于单一的继承结构，混入可以让对象获得多个功能，避免了单继承的限制。
+- 增强对象功能：可以在不修改原有类或对象的情况下，增强其功能。
+缺点：
+- 命名冲突：不同混入对象可能会有相同名称的属性或方法，导致冲突。
+- 可读性：混入会使得对象的来源和责任变得不那么清晰，可能会影响代码的可维护性。
+
+#### 实现方式
+1. 使用 Object.assign() 实现混入  
+Object.assign() 方法可以将源对象的属性复制到目标对象中，这样就实现了将一个对象的属性和方法“混入”到另一个对象中。
+```js
+const CanEat = {
+  eat() {
+    console.log("Eating...");
+  }
+};
+
+const CanSleep = {
+  sleep() {
+    console.log("Sleeping...");
+  }
+};
+
+class Person {
+  constructor(name) {
+    this.name = name;
+  }
+}
+
+// 将 CanEat 和 CanSleep 的方法混入 Person 类
+Object.assign(Person.prototype, CanEat, CanSleep);
+
+const person = new Person("John");
+person.eat();  // "Eating..."
+person.sleep();  // "Sleeping..."
+```
+Person 类没有直接继承 CanEat 或 CanSleep，而是通过 Object.assign() 方法将它们的功能混入到 Person 类的原型中，使得 Person 实例能够调用这些方法。
+
+
+2. 混入类（使用 ES6 类）  
+除了使用 Object.assign()，你也可以通过在类中直接混入多个类或对象的功能。
+```js
+class CanFly {
+  fly() {
+    console.log("Flying...");
+  }
+}
+
+class CanDive {
+  dive() {
+    console.log("Diving...");
+  }
+}
+
+class Bird {
+  constructor(name) {
+    this.name = name;
+  }
+}
+
+// 使用 mixin 函数将功能混入类
+Object.assign(Bird.prototype, CanFly.prototype, CanDive.prototype);
+
+const bird = new Bird("Eagle");
+bird.fly();  // "Flying..."
+bird.dive();  // "Diving..."
+```
+
+3. 混入函数  
+你也可以通过定义一个混入函数来将功能动态地添加到目标对象或类中。  
+```js
+function CanSpeak(target) {
+  target.prototype.speak = function() {
+    console.log("Speaking...");
+  };
+}
+
+function CanWalk(target) {
+  target.prototype.walk = function() {
+    console.log("Walking...");
+  };
+}
+
+class Human {}
+
+CanSpeak(Human); // 混入 CanSpeak 的功能
+CanWalk(Human);  // 混入 CanWalk 的功能
+
+const human = new Human();
+human.speak();  // "Speaking..."
+human.walk();   // "Walking..."
+```
+
+总结： 
+- 混入（Mixin） 是一种将多个独立的功能组合到一个对象或类中的方式，通常用于代码复用。
+- 混入并不涉及继承，它通过将方法和属性直接添加到对象的原型或类的原型中来增强对象的功能。
+- 使用混入时要注意命名冲突的问题，可以通过重命名方法或使用命名空间来避免。
+- 混入可以通过 Object.assign()、类混入、混入函数等方式实现。
+- 混入的灵活性和复用性使得它在现代 JavaScript 开发中非常常见，尤其是在实现模块化和组合模式时。
+
+可以把一个对象的属性复制到另一个对象中，但是这其实并不能带来太多的好处，无非就是少几条定义语句，而且还会带来函数对象引用问题（相当于浅层拷贝， 属性还是共享引用）。
+
+
+## 原型
+
+
+
+
+
+
+
+
+
+
+
+
+
