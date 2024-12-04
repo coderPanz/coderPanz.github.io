@@ -34,7 +34,7 @@ export default defineConfig({
         text: "JS",
         collapsed: true,
         items: [
-          { text: "我不知道的javascript", link: "/我不知道的javascript" },
+          { text: "我不知道的javascript一", link: "/我不知道的javascript一" },
           { text: "闭包", link: "/闭包" },
           { text: "代理-反射", link: "/代理-反射" },
           { text: "迭代器-生成器", link: "/迭代器-生成器" },
