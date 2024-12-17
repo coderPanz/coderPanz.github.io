@@ -724,14 +724,494 @@ a - b; // 2
 
 #### 隐式强制类型转换为布尔值
 来看看到布尔值的隐式强制类型转换，它最为常见也最容易搞错。下面的情况会发生布尔值隐式强制类型转换。  
-(1) if (..) 语句中的条件判断表达式。
-(2) for ( .. ; .. ; .. ) 语句中的条件判断表达式（第二个）。
-(3) while (..) 和 do..while(..) 循环中的条件判断表达式。
-(4) ? : 中的条件判断表达式。
-(5) 逻辑运算符 ||（逻辑或）和 &&（逻辑与）左边的操作数（作为条件判断表达式）。
+- if (..) 语句中的条件判断表达式。
+- for ( .. ; .. ; .. ) 语句中的条件判断表达式（第二个）。
+- while (..) 和 do..while(..) 循环中的条件判断表达式。
+- ? : 中的条件判断表达式。
+- 逻辑运算符 ||（逻辑或）和 &&（逻辑与）左边的操作数（作为条件判断表达式）。
 
-以上情况中，非布尔值会被隐式强制类型转换为布尔值，遵循前面介绍过的 ToBoolean 抽
-象操作规则。
+以上情况中，非布尔值会被隐式强制类型转换为布尔值，遵循前面介绍过的 ToBoolean 抽象操作规则。  
+
+
+#### || 和 &&
+逻辑运算符，它们的返回值是两个操作数中的一个（且仅一个）。
+```js
+var a = 42;
+var b = "abc";
+var c = null;
+a || b; // 42
+a && b; // "abc"
+c || b; // "abc"
+c && b; // null
+```
+|| 和 && 首先会对第一个操作数（a 和 c）执行条件判断，如果其不是布尔值（如上例）就先进行 ToBoolean 强制类型转换，然后再执行条件判断。  
+- 对于 || 来说，如果条件判断结果为 true 就返回第一个操作数（a 和 c）的值，如果为false 就返回第二个操作数（b）的值。
+- && 则相反，如果条件判断结果为true 就返回第二个操作数（b）的值，如果为 false 就返回第一个操作数（a 和 c）的值。
+
+#### 符号的强制类型转换
+ES6 中引入了符号类型，它的强制类型转换有一个坑，在这里有必要提一下。ES6 允许从符号到字符串的显式强制类型转换，然而隐式强制类型转换会产生错误
+```js
+var s1 = Symbol( "cool" );
+String( s1 ); // "Symbol(cool)"
+var s2 = Symbol( "not cool" );
+s2 + ""; // TypeError
+```
+符号不能够被强制类型转换为数字（显式和隐式都会产生错误），但可以被强制类型转换为布尔值（显式和隐式结果都是 true）。由于规则缺乏一致性，我们要对 ES6 中符号的强制类型转换多加小心。  
+
+
+### 宽松相等和严格相等
+常见的误区是“== 检查值是否相等，=== 检查值和类型是否相等”。听起来蛮有道理，然而还不够准确。很多 JavaScript 的书籍和博客也是这样来解释的，但是很遗憾他们都错了。  
+正确的解释是：“== 允许在相等比较中进行强制类型转换，而 === 不允许。”  
+
+
+#### 相等比较操作的性能
+有人觉得 == 会比 === 慢，实际上虽然强制类型转换确实要多花点时间，但仅仅是微秒级（百万分之一秒）的差别而已。  
+如果进行比较的两个值类型相同，则 == 和 === 使用相同的算法，所以除了 JavaScript 引擎实现上的细微差别之外，它们之间并没有什么不同。  
+如果两个值的类型不同，我们就需要考虑有没有强制类型转换的必要，有就用 ==，没有就用 ===，不用在乎性能。  
+
+
+#### 抽象相等
+ES5 规范的“抽象相等比较算法”定义了 == 运算符的行为。该算法简单而又全面，涵盖了所有可能出现的类型组合，以及它们进行强制类型转换的方式。  
+规定如果两个值的类型相同，就仅比较它们是否相等。例如，42等于 42，"abc" 等于 "abc"。  
+
+**特殊情况**
+- NaN 不等于 NaN
+- +0 等于 -0
+
+
+规范最后定义了对象（包括函数和数组）的宽松相等 ==。两个对象指向同一个值时即视为相等，不发生强制类型转换。  
+规范额外补充 == 在比较两个不同类型的值时会发生隐式强制类型转换，会将其中之一或两者都转换为相同的类型后再进行比较。  
+
+**1. 字符串和数字之间的相等比较**
+因为没有强制类型转换，所以 a === b 为 false，42 和 "42" 不相等。  
+而 a == b 是宽松相等，即如果两个值的类型不同，则对其中之一或两者都进行强制类型转换。具体要怎么定义呢？  
+ES5 规范中定义到：  
+- 如果 Type(x) 是数字，Type(y) 是字符串，则返回 x == ToNumber(y) 的结果。
+- 如果 Type(x) 是字符串，Type(y) 是数字，则返回 ToNumber(x) == y 的结果。
+
+
+```js
+var a = 42;
+var b = "42";
+a == b; // true
+a === b; // false
+```
+
+
+**其他类型和布尔类型之间的相等比较**  
+== 最容易出错的一个地方是 true 和 false 与其他类型之间的相等比较。  
+```js
+var a = "42";
+var b = true;
+a == b; // false
+```
+我们都知道 "42" 是一个真值，为什么 == 的结果不是 true 呢？原因既简单又复杂，让人很容易掉坑里，很多 JavaScript 开发人员对这个地方并未引起足够的重视。  
+看如下规范：  
+- 如果 Type(x) 是布尔值，则返回 ToNumber(x) == y 的结果。
+- 如果 Type(y) 是布尔值，则返回 x == ToNumber(y) 的结果。
+
+Type(x) 是布尔值，所以 ToNumber(x) 将 true 强制类型转换为 1，变成 1 == "42"，二者的类型仍然不同，"42" 根据规则被强制类型转换为 42，最后变成 1 == 42，结果为 false。  
+
+重点是我们要搞清楚 == 对不同的类型组合怎样处理。== 两边的布尔值会被强制类型转换为数字，很奇怪吧？无论什么情况下都尽量不要使用 == true 和 == false。  
+
+```js
+var a = "42";
+// 不要这样用，条件判断不成立：
+if (a == true) {
+ // ..
+}
+// 也不要这样用，条件判断不成立：
+if (a === true) {
+ // ..
+}
+// 这样的显式用法没问题：
+if (a) {
+ // ..
+}
+// 这样的显式用法更好：
+if (!!a) {
+ // ..
+}
+// 这样的显式用法也很好：
+if (Boolean( a )) {
+ // ..
+}
+```
+避免了 == true 和 == false（也叫作布尔值的宽松相等）之后我们就不用担心这些坑了。  
+
+**null 和 undefined 之间的相等比较**  
+null 和 undefined 之间的 == 也涉及隐式强制类型转换。ES5 规范规定：
+- 如果 x 为 null，y 为 undefined，则结果为 true。
+- 如果 x 为 undefined，y 为 null，则结果为 true。
+
+```js
+var a = null;
+var b;
+a == b; // true
+a == null; // true
+b == null; // true
+a == false; // false
+b == false; // false
+a == ""; // false
+b == ""; // false
+a == 0; // false
+b == 0; // false
+```
+这也就是说在 == 中 null 和 undefined 是一回事，可以相互进行隐式强制类型转换，null 和 undefined 之间的强制类型转换是安全可靠的，**在 == 中 null 和 undefined 相等（它们也与其自身相等），除此之外其他值都不存在这种情况。**
+
+
+**对象和非对象之间的相等比较**  
+关于对象（对象 / 函数 / 数组）和基本类型（字符串 / 数字 / 布尔值）之间的相等比较，ES5 规范做如下规定：  
+- 如果 Type(x) 是字符串或数字，Type(y) 是对象，则返回 x == ToPrimitive(y) 的结果；
+- 如果 Type(x) 是对象，Type(y) 是字符串或数字，则返回 ToPromitive(x) == y 的结果。
+
+**tip**： 这里只提到了字符串和数字，没有布尔值。原因是之前介绍过规定了布尔值会先被强制类型转换为数字。  
+
+```js
+var a = 42;
+var b = [ 42 ];
+a == b; // true
+```
+[ 42 ] 首先调用 ToPromitive 抽象操作，返回 "42"，变成 "42" == 42，然后又变成 42 == 42，最后二者相等。  
+“拆封”，即“打开”封装对象（如 new String("abc")），返回其中的基本数据类型值（"abc"）。== 中的 ToPromitive 强制类型转换也会发生这样的情况。  
+
+```js
+var a = "abc";
+var b = Object( a ); // 和new String( a )一样
+a === b; // false
+a == b; // true
+```
+a == b 结果为 true，因为 b 通过 ToPromitive 进行强制类型转换（也称为“拆封”），并返回基本类型值 "abc"，与 a 相等。  
+**但有一些值不这样，原因是 == 算法中有优先级更高的规则。例如：**
+```js
+var a = null
+var b = Object(a) // {}
+console.log(a == b) // false
+var c = undefined
+var d = Object(c) // {}
+console.log(c == d) // false
+var e = NaN
+var f = Object(e) // 包装对象：{ NaN }
+console.log(e == f) // false
+```
+因为没有对应的封装对象，所以 null 和 undefined 不能够被封装（boxed），Object(null)和 Object() 均返回一个常规对象:{}。NaN 能够被封装为数字封装对象，但拆封之后 NaN == NaN 返回 false，因为 NaN 不等于 NaN。  
+
+
+**特殊情况**  
+只有 undefined == null 成立, 在看其他的情况。
+```js
+"0" == null; // false
+"0" == undefined; // false
+"0" == false; // true -- 晕！
+"0" == NaN; // false
+"0" == 0; // true
+"0" == ""; // false
+false == null; // false
+false == undefined; // false
+false == NaN; // false
+false == 0; // true -- 晕！
+false == ""; // true -- 晕！
+false == []; // true -- 晕！
+false == {}; // false
+"" == null; // false
+"" == undefined; // false
+"" == NaN; // false
+"" == 0; // true -- 晕！
+"" == []; // true -- 晕！
+"" == {}; // false
+0 == null; // false
+0 == undefined; // false
+0 == NaN; // false
+0 == []; // true -- 晕！
+0 == {}; // false
+```
+
+**极端情况一**  
+```js
+[] == ![] // true
+```
+**this is crazy!**  
+事实并非如此。让我们看看 ! 运算符都做了些什么？根据 ToBoolean 规则，它会进行布尔值的显式强制类型转换（同时反转奇偶校验位）。所以 [] == ![] 变成了 [] == false。前面我们讲过 false == []。  
+
+**极端情况二**  
+```js
+2 == [2]; // true
+"" == [null]; // true
+```
+== 右边的值 [2] 和 [null] 会进行 ToPrimitive 强制类型转换，以便能够和左边的基本类型值（2 和 ""）进行比较。因为数组的 valueOf() 返回数组本身，所以强制类型转换过程中数组会进行字符串化。  
+第一行中的 [2] 会转换为 "2"，然后通过 ToNumber 转换为 2。第二行中的 [null] 会直接转换为 ""。  
+**所以最后的结果就是 2 == 2 和 "" == ""。**  
+
+valueOf(): JavaScript 调用 valueOf 方法来将对象转换成基本类型值。你很少需要自己调用 valueOf 方法；当遇到需要基本类型值的对象时，JavaScript 会自动的调用该方法。  
+
+
+**前面列举了相等比较中的强制类型转换的 7 个坑**  
+```js
+"0" == false; // true -- 晕！
+false == 0; // true -- 晕！
+false == ""; // true -- 晕！
+false == []; // true -- 晕！
+"" == 0; // true -- 晕！
+"" == []; // true -- 晕！
+0 == []; // true -- 晕！
+```
+其中有 4 种情况涉及 == false，之前我们说过应该避免。  
+现在剩下 3 种：
+```js
+"" == 0; // true 根据规则，"" 会调用Number("")变为 0，然后 0 == 0 结果为 true
+"" == []; // true 根据规则，数组会ToPrimitive进行强制类型转换变为“”，“” == “”结果为true
+0 == []; // true 根据规则，数组会ToPrimitive进行强制类型转换变为“”，“” 在调用Number("")变为0，0 == 0 结果为true
+```
+
+
+**安全运用隐式强制类型转换**  
+我们要对 == 两边的值认真推敲，以下两个原则可以让我们有效地避免出错。  
+- 如果两边的值中有 true 或者 false，千万不要使用 ==。
+- 如果两边的值中有 []、"" 或者 0，尽量不要使用 ==。
+
+这时最好用 === 来避免不经意的强制类型转换。这两个原则可以让我们避开几乎所有强制类型转换的坑。  
+
+
+## 语法特性
+### 表达式的副作用
+```js
+var a = 42;
+var b = a++;
+```
+a++ 首先返回变量 a 的当前值 42（将该值赋给 b），然后将 a 的值加 1。递增运算符 ++ 和递减运算符 -- 都是一元运算符。
+- ++a：先递增在返回
+- a++：先返回在递增
+
+常有人误以为可以用括号 ( ) 将 a++ 的副作用封装起来，例如：
+```js
+var a = 42
+var b = (a++)
+console.log(a) // 43
+console.log(b) // 42
+```
+**然-并-卵**  
+
+如 delete 运算符, ，delete 用来删除对象中的属性和数组中的单元。它通常以单独一个语句的形式出现：  
+```js
+var obj = {
+ a: 42
+};
+obj.a; // 42
+delete obj.a; // true
+obj.a; // undefined
+```
+如果操作成功，delete 返回 true，否则返回 false。其副作用是属性被从对象中删除（或者单元从 array 中删除）。  
+
+**链式赋值**:   
+```js
+var a, b, c;
+a = b = c = 42;
+```
+这里 c = 42 的结果值为 42（副作用是将 c 赋值 42），然后 b = 42 的结果值为 42（副作用是将 b 赋值 42），最后是 a = 42（副作用是将 a 赋值 42）。  
+一下案例在严格模式中会报错, 因为 b 没用经过声明就试图赋值。  
+```js
+'use strict';
+var a = b = 42
+console.log(a, b)
+```
+
+### 运算符优先级
+JavaScript 中的 && 和 || 运算符返回它们其中一个操作数的值，而非 true 或 false。  
+在一个运算符两个操作数的情况下这比较好理解，**那么两个运算符三个操作数呢？**  
+```js
+var a = 42;
+var b = "foo";
+var c = [1,2,3];
+a && b || c; // ???
+a || b && c; // ???
+```
+想知道结果就需要了解超过一个运算符时表达式的执行顺序, 这些规则被称为“运算符优先级”。  
+首先我们要搞清楚 (a && b || c) 执行的是 (a && b) || c 还是 a && (b || c) ？它们之间有什么区别？
+```js
+(false && true) || true; // true
+false && (true || true); // false
+```
+事实证明它们是有区别的，false && true || true 的执行顺序如下：
+```js
+false && true || true; // true
+(false && true) || true; // true
+```
+&& 先执行，然后是 ||  
+那执行顺序是否就一定是从左到右呢？不妨将运算符颠倒一下看看：  
+```js
+true || false && false; // true
+(true || false) && false; // false
+true || (false && false); // true
+```
+和显然，他们不看执行顺序，而是注重优先级来执行的。  
+
+运算符优先级基本分类
+- 括号运算符 ()：最优先，括号内的内容会先执行。
+- 单目运算符：如 ++、--、+、-、!、typeof、void、delete 等。
+- 算术运算符：如 *、/、% 等。
+- 加法和减法运算符：如 +、-。
+- 比较运算符：如 ==、!=、<、<=、>、>= 等。
+- 逻辑运算符：如 &&、||。
+- 赋值运算符：如 =、+=、-=、*= 等。
+- 逗号运算符 ,：最低优先级。
+
+**运算符优先级**  
+**注意**：对于自增自减，括号无法限制。  
+1. ()  - 圆括号
+2. ++, --, + (一元运算符), - (一元运算符), ~, !, typeof, void, delete - 一元操作符
+3. *, /, % - 乘除模运算
+4. +, - - 加减运算
+5. <<, >>, >>> - 位移运算
+6. <, <=, >, >=, in, instanceof - 比较运算符
+7. ==, !=, ===, !== - 相等运算符
+8. && - 逻辑与
+9. || - 逻辑或
+10. =, +=, -=, *=, /=, %=, <<=, >>=, >>>=, &=, ^=, |= - 赋值运算符
+11. , - 逗号运算符
+
+### 短路
+**对 && 和 || 来说，如果从左边的操作数能够得出结果，就可以忽略右边的操作数**。我们将这种现象称为“短路”（即执行最短路径）。  
+以 a && b 为例，如果 a 是一个假值，足以决定 && 的结果，就没有必要再判断 b 的值。同样对于 a || b，如果 a 是一个真值，也足以决定 || 的结果，也就没有必要再判断 b 的值。  
+
+### 自动分号
+有时 JavaScript 会自动为代码行补上缺失的分号，即自动分号插入（ASI），请注意，ASI 只在换行符处起作用，而不会在代码行的中间插入分号。  
+如果 JavaScript 解析器发现代码行可能因为缺失分号而导致错误，那么它就会自动补上分号。并且，只有在代码行末尾与换行符之间除了空格和注释之外没有别的内容时，它才会这样做。  
+
+### 错误机制
+1. SyntaxError（语法错误）：SyntaxError 表示代码的语法不符合 JavaScript 的语法规则。当代码无法被 JavaScript 引擎解析时，就会抛出这个错误。  
+```js
+// 示例 1：缺少括号
+if (true {  // 应该是 if (true) {
+  console.log('Hello');
+}
+// 抛出 SyntaxError: Unexpected token {
+
+// 示例 2：字符串没有闭合引号
+let str = "Hello;  // 应该是 let str = "Hello";
+```
+2. TypeError（类型错误）: TypeError 通常发生在尝试对不符合预期的数据类型进行操作时。例如，试图访问 null 或 undefined 上的属性，或调用一个不是函数的值。  
+```js
+// 示例 1：访问 null 或 undefined 的属性
+let obj = null;
+console.log(obj.name);  // TypeError: Cannot read properties of null (reading 'name')
+
+// 示例 2：调用非函数对象
+let notAFunction = 123;
+notAFunction();  // TypeError: notAFunction is not a function
+```
+
+3. ReferenceError（引用错误）: ReferenceError 表示代码中引用了一个未声明或未定义的变量。这通常发生在变量未被正确声明或初始化时。  
+```js
+// 示例 1：使用未声明的变量
+console.log(x);  // ReferenceError: x is not defined
+
+// 示例 2：在块作用域外访问 let 或 const 声明的变量
+if (true) {
+  let y = 10;
+}
+console.log(y);  // ReferenceError: y is not defined
+```
+
+4. RangeError（范围错误）: RangeError 在给定值超出有效范围时抛出。通常出现在数学运算或数据范围处理时。
+```js
+// 示例 1：数组索引超出范围
+let arr = [1, 2, 3];
+console.log(arr[10]);  // 不会抛出 RangeError，但返回 undefined
+
+// 示例 2：调用无效的数字范围 (es6新增了Infinity， 所以es6环境下不会报错)
+let result = Math.pow(10, 1000);  // RangeError: Result too large
+```
+
+6. URIError（URI 错误）： URIError 是当 encodeURI() 或 decodeURI() 等函数传入无效的 URI 时抛出的错误。  
+```js
+// 示例 1：URI 解码无效字符
+decodeURIComponent('%');  // URIError: URI malformed
+```
+
+**JavaScript 提供了异常处理机制 try...catch...finally，它可以帮助捕获并处理运行时的错误。**  
+try..catch 对我们来说可能已经非常熟悉了。但你是否知道 try 可以和 catch 或者 finally配对使用，并且必要时两者可同时出现？finally 中的代码总是会在 try 之后执行，如果有 catch 的话则在 catch 之后执行。也可以将 finally 中的代码看作一个回调函数，即无论出现什么情况最后一定会被调用。  
+
+如果 try 中有 return 语句会出现什么情况呢？ return 会返回一个值，那么调用该函数并得到返回值的代码是在 finally 之前还是之后执行呢？  
+```js
+function foo() {
+  try {
+    return 42;  // 这里会执行，返回 42,throw Error() 抛出异常以不会影响 finally 执行。
+  } finally {
+    console.log("Hello");  // 这里的代码总是会执行
+  }
+  console.log("never runs");  // 这行代码永远不会执行
+}
+
+console.log(foo());
+```
+try...finally 语句有一个特殊的行为：finally 代码块中的内容总是会执行，无论 try 代码块中是否抛出了异常或者返回了值。即使 try 中执行了 return 语句，finally 中的代码仍然会被执行，且 finally 执行后会返回 try 中的值。  
+
+**执行步骤**：
+- try 代码块执行：try 代码块中的 return 42; 被执行。此时，函数的返回值 42 会被记录，但并不会立即返回，因为 finally 代码块还没有执行。
+- finally 代码块执行：无论 try 中是否有 return 或者其他异常，finally 中的代码会始终执行。在这里，console.log("Hello") 会被执行，打印出 "Hello"。
+- 函数的返回值：finally 代码块执行后，JavaScript 引擎会继续执行 return 语句，并返回 try 中的值（即 42）。因此，foo() 函数最终返回的是 42。
+- console.log("never runs")：finally 中的代码执行完成后，函数会返回，所以 finally 后面的代码不会被执行。console.log("never runs") 永远不会运行，因为它位于 finally 之后，return 语句的执行会中断该函数的进一步执行。  
+
+**continue 和 break 等控制语句也是如此:**  
+```js
+for (var i=0; i<10; i++) {
+ try {
+ continue;
+ }
+ finally {
+ console.log( i );
+ }
+}
+// 0 1 2 3 4 5 6 7 8 9
+```
+**注意**
+- "break" 语句只能在封闭迭代或 switch 语句内使用。（一般情况）
+- "continue" 语句只能在封闭迭代语句内使用。   
+特殊情况：但尽量不要这么写，这会使代码变得晦涩难懂。
+```js
+function foo() {
+  bar: {
+    try {
+      return 42
+    } finally {
+      // 跳出标签为bar的代码块
+      break bar
+    }
+  }
+  console.log("Crazy")
+  return "Hello"
+}
+console.log(foo())
+```
+ 
+
+**注意：** finally 中的 return 会覆盖 try 和 catch 中 return 的返回值  
+```js
+function foo() {
+  try {
+     return 1
+  } finally { 
+  }
+}
+console.log(foo()) // 1
+
+function foo() {
+  try {
+     return 1
+  } finally {
+    return 
+  }
+}
+console.log(foo()) // undefined
+```
+
+
+
+
+
+
+
+
 
 
 
