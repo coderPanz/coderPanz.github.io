@@ -1,7 +1,7 @@
 import Theme from "vitepress/theme"
 // import "./custom-font.css"
 import "./style/var.css"
-import "viewerjs/dist/viewer.min.css"
+// import "viewerjs/dist/viewer.min.css"
 import imageViewer from "vitepress-plugin-image-viewer"
 import vImageViewer from "vitepress-plugin-image-viewer/lib/vImageViewer.vue"
 import { useRoute } from "vitepress"
