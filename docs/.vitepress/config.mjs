@@ -159,6 +159,14 @@ export default defineConfig({
           { text: "css动画", link: "/css动画" },
         ],
       },
+      {
+        text: "React笔录",
+        collapsed: true,
+        items: [
+          { text: "react笔录一", link: "/react笔录一" },
+          { text: "react笔录二", link: "/react笔录二" },
+        ],
+      },
     ],
 
     socialLinks: [
