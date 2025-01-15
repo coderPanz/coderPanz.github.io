@@ -1,7 +1,7 @@
 <!--
  * @Author: qs
  * @Date: 2025-01-14 14:14:38
- * @LastEditTime: 2025-01-15 16:15:18
+ * @LastEditTime: 2025-01-15 16:27:53
  * @LastEditors: qs
  * @Description:
  * @FilePath: /coderPanz.github.io/docs/react笔录二.md
@@ -229,4 +229,6 @@ function ChildComponent() {
 - 比受控组件更简洁，尤其是对于简单的表单和少量的输入字段。
 - 性能更好，避免每次输入变化都重新渲染组件。
 
-
+## 为什么函数式组件需要 hooks
+  主要是为了组件中的**状态管理**，因为函数式组件的执行是函数调用，每次执行或者 ui 更新都需要重新调用，导致组件状态不能持久化，也就是函数式组件不能保持状态。 所以需要 hooks 来传递状态到组件对应的 fiber 树中保存。  
+由于 react 函数式组件遵循函数式编程和纯函数概念，所以引入 useEffect 来处理副作用。至于 useMemo 和 useCallback 则是为了优化性能，减少不必要的重新渲染，他们在使用的过程中也会涉及到组件更新前后的**状态对比**。
