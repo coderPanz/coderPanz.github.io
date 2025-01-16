@@ -151,6 +151,16 @@ const ParentComponent = () => {
 };
 ```
 **注意：** 在 React 19 中，forwardRef 不再是必需的。改为将 ref 作为 prop 传递然后直接挂载到需要绑定的 DOM 元素或者 react 组件上。 forwardRef 将在未来版本中弃用。
+
+```js
+function MyInput({placeholder, ref}) {
+  return <input placeholder={placeholder} ref={ref} />
+}
+
+//...
+<MyInput ref={ref} />
+```
+
 #### useImperativeHandle 原理
 useImperativeHandle 是 React 的一个 Hook，用于在使用 forwardRef 包裹的子组件中自定义暴露给父组件的 ref内容，也就是父组件通过 ref 访问子组件时，只能访问到 useImperativeHandle 暴露的内容，其实它的目的就是限制父组件对子组件的访问权。
 ```js
