@@ -1,7 +1,7 @@
 <!--
  * @Author: qs
  * @Date: 2025-01-15 18:02:14
- * @LastEditTime: 2025-01-15 20:24:24
+ * @LastEditTime: 2025-01-16 11:35:37
  * @LastEditors: qs
  * @Description:
  * @FilePath: /coderPanz.github.io/docs/react笔录三.md
@@ -192,3 +192,230 @@ const { unstable_batchedUpdates } = ReactDOM
 ```
 
 ## 函数组件中的 state
+函数式组件使用 useState 钩子函数来管理状态。
+```jsx
+import React, { useState } from 'react';
+
+function Counter() {
+  const [count, setCount] = useState(0);
+
+  return <div>Count: {count}</div>;
+}
+```
+`api: [ state , setState ] = useState(initData)`  
+- state 是组件内部的状态数据。
+- setState 是用于更新 state 的函数。
+- initData 有两种情况，第一种情况是非函数，将作为 state 初始化的值。 第二种情况是函数，函数的返回值作为 useState 初始化的值。  
+
+**如何监听 state 变化？**  
+  类组件 setState 中，有第二个参数 callback 或者是生命周期 componentDidUpdate 可以检测监听到 state 改变或是组件更新。  
+那么在函数组件中，如何怎么监听 state 变化呢？这个时候就需要 useEffect 出场了，通常可以把 state 作为依赖项传入 useEffect 第二个参数 deps ，但是注意 useEffect 初始化会默认执行一次。  
+```jsx
+useEffect(() => {
+  // 组件初始化后默认执行一次后，当再次执行式代表 state 变化了
+  console.log('state 变化了');
+}, [state]);
+```
+
+**注意⚠️：** 在本次函数执行上下文中，是获取不到最新的 state 值的，由于 state 状态发生改变导致函数组件更新，函数组件的更新就是函数的执行，在函数一次执行过程中，函数内部所有变量重新声明，所以改变的 state ，只有在下一次函数组件执行时才会被更新。所以在如上同一个函数执行上下文中，number 一直为 0，无论怎么打印，都拿不到最新的 state 。  
+可以这么理解，state 状态的更新导致函数组件的更新意味着函数重新执行，它会创建一个新的函数执行上下文，最新的状态只有在这个新的执行上下文中才能拿到，而你在当前函数执行上下文中尝试 console.log(state) ，肯定拿到的都是旧值。
+
+**useState 的性能优化**  
+useState 会对 state 进行浅比较，如果 state 的值没有发生变化（例如修改对象的属性 old: obj.a = 1，new: obj.a = 2），则不会重新渲染组件。  
+原理：因为这次修改都指向了同一个内存空间，所以默认认为没有发生变化，就不会发生重新渲染；如果改为 `useState({...obj})` ，那么 obj 的内存空间发生变化，就会发生重新渲染。  
+
+
+## QA
+### 类组件中的 setState 和函数组件中的 useState 有什么异同？  
+首先从原理角度出发，setState和 useState 更新视图，底层都调用了 scheduleUpdateOnFiber 方法，而且事件驱动情况下都有批量更新规则。  
+- 在不是 pureComponent 组件模式下， setState 不会浅比较两次 state 的值，只要调用 setState，在没有其他优化手段的前提下，就会执行更新。但是 useState 中的 dispatchAction 会默认比较两次 state 是否相同，然后决定是否更新组件。
+- setState 有专门监听 state 变化的回调函数 callback，可以获取最新state；但是在函数组件中，只能通过 useEffect 来执行 state 变化引起的副作用。
+- setState 在底层处理逻辑上主要是和老 state 进行合并处理，而 useState 更倾向于重新赋值。
+
+### 
+
+### state 相关的代码输出题
+```jsx
+// 第一道
+const [arr, setArr] = useState([]);
+const test = () => {
+  arr.push({});
+};
+console.log(arr); // 未打印（setArr 未执行且没有触发 render）
+return <div onClick={test}>App</div>
+
+// 第二道
+const [arr, setArr] = useState([]);
+const test = () => {
+  arr.push({});
+  setArr(arr);
+};
+console.log(arr); // 未打印（arr 内存地址没有改变，所以没有监听到变化，setArr 没有触发 render）
+return <div onClick={test}>App</div>
+
+// 第三道
+const [arr, setArr] = useState([]);
+const test = () => {
+  setArr([]);
+};
+console.log(arr); // 打印（ [] !== []，内存地址变了，触发 render）
+return <div onClick={test}>App</div>
+```
+
+**dispatch 注意事项 - 非函数和函数情况**  
+```jsx
+// 非函数
+// 非函数情况，此时将作为新的值，赋予给 state，作为下一次渲染使用
+// 例1：直接传递对象的 setState 会被合并成一次
+componentDidMount() {
+  this.setState({ index: this.state.index + 1 }, () => {
+    console.log(this.state.index);  // 1
+  })
+  this.setState({ index: this.state.index + 1 }, () => {
+    console.log(this.state.index); // 1
+  })
+}
+// 例2：
+const [ number , setNumber ] = React.useState(0)
+const handleClick = () => {
+  setNumber(2) // => number = 2
+  setNumber(number + 1) // => number = 0 + 1 = 1
+  setNumber(number + 1) // => number = 0 + 1 = 1
+};
+// 例3：
+const [count, setCount] = useState(0);
+const test = () => {
+  setTimeout(() => {
+    setCount(count + 1);
+  }, 3000);
+  console.log(count);
+};
+return <div onClick={test}>App</div>;
+// 输出：0->0->0->...->1
+// 原因：闭包旧值，每次 setCount 的 count为 0+1
+
+// 函数
+// 函数的情况，如果 dispatch 的参数为一个函数，这里可以称它为 reducer 参数，是上一次返回最新的 state，返回值作为新的 state。
+// 例1：使用函数传递 state 不会被合并
+componentDidMount() {
+  this.setState((preState) => ({ index: preState.index + 1 }), () => {
+    console.log(this.state.index); // 2
+  })
+  this.setState(preState => ({ index: preState.index + 1 }), () => {
+    console.log(this.state.index); // 2
+  })
+}
+// 例2：
+const [ number , setNumber ] = React.useState(0)
+const handleClick = () => {
+  setNumber((state) => state + 1) // => number = 0 + 1 = 1
+  setNumber((state) => state + 1) // => number = 1 + 1 = 2
+  setNumber(8)  // state - > 8
+  setNumber((state)=> state + 1)  // number - > 8 + 1 = 9
+};
+// 例3：
+const [count, setCount] = useState(0);
+const test = () => {
+  setTimeout(() => {
+    setCount(count => count + 1);
+  }, 3000);
+  console.log(count);
+};
+return <div onClick={test}>App</div>;
+// 输出：0->1->1->...->1
+```
+**结论：**  
+- 非函数情况下：setNumber 将参数作为新的值赋予 state，下一次渲染时使用。直接传递对象的 setstate 会被合并成一次。
+- 函数情况下：传入函数的入参是上一次返回的最新 state，而函数的返回值作为新的值赋予 state，下一次渲染使用。使用函数传递 state 不会被合并。  
+
+
+**setState 批量更新？同步异步？**  
+```jsx
+// class 组件 - setState
+// 情况1：react 17及之前且在非 setTimeout、事件监听器等异步操作中
+// 钩子函数和 React 合成事件中
+class App extends Component {
+    constructor() {
+        super();
+        this.state = {
+            count: 0
+        }
+    }
+    componentDidMount() {
+        this.setState({
+            count: 1
+        });
+        console.log(this.state.count);
+        this.setState({
+            count: 2
+        });
+        console.log(this.state.count);
+    }
+    render() {
+        console.log('render', this.state.count); // 最终是 2
+        return <div>{this.state.count}</div>;
+    }
+}
+// 输出：render 0 -> 0 0 -> render 2
+// 结论：setState 是异步的，批量的，合并 state，然后触发 render 函数，得到新的 UI 视图层，完成 render 阶段。两次打印都是 0，而且两次 setState 只触发了一次 render，加上最开始的 render，一共两次，打印 0、2。说明此情况下 setState 是异步的。
+
+// 情况2：react 17及之前且在 setTimeout、事件监听器等异步操作中
+class App extends Component {
+    constructor() {
+        super();
+        this.state = {
+            count: 0
+        }
+    }
+    componentDidMount() {
+setTimeout(() => {
+            this.setState({
+                count: 1
+            });
+            console.log(this.state.count);
+            this.setState({
+                count: 2
+            });
+            console.log(this.state.count);  
+        });
+    }
+    render() {
+        console.log('render', this.state.count); // 最终是 2
+        return <div>{this.state.count}</div>;
+    }
+}
+// 输出：render 0 -> render 1 -> 1 -> render 2 -> 2
+// 结论：异步操作里面的批量更新规则会被打破。setState 在 setTimeout 异步函数中同步修改了 state，且然后每次都触发了渲染，一共 render 3 次，分别是 0、1、2。说明 react 17及之前且在 setTimeout、事件监听器等异步操作中 setState 是同步的，非批量的，每次 setState 后 state 马上变，每次修改 state 都会 render。
+// 手动批量更新：React-Dom 中提供了批量更新方法 `unstable_batchedUpdates`，可以去手动批量更新，使其在异步操作中 setState 批量更新。
+
+// function 函数组件 - useState
+// 情况1：react 17及之前且在非 setTimeout、事件监听器等异步函数或原生事件中
+function App(){
+    const [count, setCount] = useState(0);
+    useEffect(() => {
+        setCount(1);
+        setCount(2);
+        setCount(3);
+    }, [])
+    console.log('render:', count); // 最终是 3
+    return <div>{count}</div>;
+}
+// 输出：render 0 ->  render 3
+// 结论：react 17及之前，与 setState 一样，三次 setState 只触发了一次 render，此条件下 useState 是异步的，批量的，合并 state，然后触发 render 函数，得到新的 UI 视图层，完成 render 阶段。
+
+// 情况2：react 17及之前且在 setTimeout、事件监听器等异步函数或原生事件中
+function App(){
+    const [count, setCount] = useState(0);
+     useEffect(() => {
+      setTimeout(() => {
+        setCount(1);
+        setCount(2);
+        setCount(3);
+      });
+    }, [])
+    console.log('render:', count);// 最终是 3
+    return <div>{count}</div>;
+}
+// 输出：render 0 -> render 1 -> render 2 -> render 3
+// 结论：react 17及之前，异步操作里面的批量更新规则会被打破。与 setState 一样，在 setTimeout 里，useState 是同步的，非批量的，每次 setState 后 state 马上变，每次修改 state 都会 render。
+```

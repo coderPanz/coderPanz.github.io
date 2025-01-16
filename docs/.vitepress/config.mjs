@@ -165,6 +165,7 @@ export default defineConfig({
         items: [
           { text: "react笔录一", link: "/react笔录一" },
           { text: "react笔录二", link: "/react笔录二" },
+          { text: "react笔录三", link: "/react笔录三" },
         ],
       },
     ],
