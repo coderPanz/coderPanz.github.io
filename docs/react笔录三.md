@@ -1,14 +1,14 @@
 <!--
  * @Author: qs
  * @Date: 2025-01-15 18:02:14
- * @LastEditTime: 2025-01-16 11:35:37
+ * @LastEditTime: 2025-01-16 14:52:08
  * @LastEditors: qs
  * @Description:
  * @FilePath: /coderPanz.github.io/docs/react笔录三.md
  *
 -->
 
-# react 笔录三-组件状态管理
+# react 笔录三-组件状态管理-Props
 
 ## React 状态
   State 在组件内部初始化，可以被组件自身修改，而外部不能访问也不能修改。你可以认为 State 是一个局部的、只能被组件自身控制的数据源，State 中状态可以通过 setState 方法进行更新，数据的更新会导致组件的重新渲染。  
@@ -419,3 +419,90 @@ function App(){
 // 输出：render 0 -> render 1 -> render 2 -> render 3
 // 结论：react 17及之前，异步操作里面的批量更新规则会被打破。与 setState 一样，在 setTimeout 里，useState 是同步的，非批量的，每次 setState 后 state 马上变，每次修改 state 都会 render。
 ```
+
+
+## Props
+  父组件绑定在它们标签里的属性/方法，最终会变成 props 传递给它们。但是这也不是绝对的，对于一些特殊的属性，比如说 ref 或者 key ，React 会在底层做一些额外的处理。首先来看一下 React 中 props 可以是些什么东西？  
+  说白了就是父组件传递给子组件的数据，或者是说是组件通信的一种方式。  
+PropsComponent 如果是一个类组件，那么可以直接通过 this.props 访问到它。在标签内部的属性和方法会直接绑定在 props 对象的属性上，对于组件的插槽会被绑定在 props 的 Children 属性中。  
+
+**监听 props 改变**  
+- 在类组件中使用 getDerivedStateFromProps 生命周期函数，可以监听到 props 的改变。  
+- 在函数组件中使用 useEffect 钩子函数，可以监听到 props 的改变。  
+
+### props 模式  
+在 React 中，props 是组件间传递数据的方式。props 可以通过不同的模式来进行传递和处理，以下是一些常见的模式：  
+
+**1. 基本传值模式**  
+这是 React 中最基础的 props 使用模式。父组件通过 props 将数据传递给子组件，子组件通过 props 接收这些数据。  
+```jsx
+function Parent() {
+  const message = "Hello from Parent!";
+  return <Child message={message} />;
+}
+
+function Child(props) {
+  return <p>{props.message}</p>;
+}
+```
+
+**2. 默认 Props 模式**  
+React 允许为组件的 props 设置默认值。当父组件没有传递某个 prop 时，组件将使用默认值。
+```jsx
+function Greeting({ name }) {
+  return <p>Hello, {name}!</p>;
+}
+
+Greeting.defaultProps = {
+  name: 'Guest',
+};
+
+export default Greeting;
+```
+在上面的例子中，Greeting 组件的 name 如果没有传递，则会使用 'Guest' 作为默认值。  
+
+**3. 函数作为 Props**  
+在 React 中，函数可以作为 props 传递给子组件，子组件可以通过调用该函数来与父组件进行通信。  
+```jsx
+function Parent() {
+  const handleClick = () => {
+    alert('Button clicked in Parent');
+  };
+  return <Child onClick={handleClick} />;
+}
+
+function Child(props) {
+  return <button onClick={props.onClick}>Click Me</button>;
+}
+```
+在这个例子中，Parent 将一个函数 handleClick 作为 onClick 传递给 Child，当按钮被点击时，Child 调用父组件传递的函数。  
+
+
+**4. 组件作为 Prop**  
+这个模式也叫做 render props，它通过将一个组件或函数作为 prop 传递给子组件，使子组件能够渲染由父组件定义的内容。  
+```jsx
+function Container({ render }) {
+  const ContainerProps = {
+    name: 'React',
+    message: 'Render Props Example'
+  };
+  return render(ContainerProps);
+}
+
+function Parent() {
+  return (
+    <Container render={(props) => <Child {...props} />} />
+  );
+}
+
+function Child({ name, message }) {
+  return (
+    <div>
+      <h1>{name}</h1>
+      <p>{message}</p>
+    </div>
+  );
+}
+```
+在这个例子中，Container 组件接收一个 render 函数作为 prop，并将数据传递给该函数。在 Parent 组件中，render 函数定义了 Child 组件的渲染方式。  
+
