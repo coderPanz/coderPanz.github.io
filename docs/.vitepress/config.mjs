@@ -157,6 +157,7 @@ export default defineConfig({
           { text: "计算机网络", link: "/计算机网络" },
           { text: "看代码说结果", link: "/看代码说结果" },
           { text: "css动画", link: "/css动画" },
+          { text: "爱忽略的 git", link: "/为啥总是不关注 git.md" },
         ],
       },
       {
@@ -166,6 +167,9 @@ export default defineConfig({
           { text: "react笔录一", link: "/react笔录一" },
           { text: "react笔录二", link: "/react笔录二" },
           { text: "react笔录三", link: "/react笔录三" },
+          { text: "react笔录四", link: "/react笔录四" },
+          { text: "react笔录五", link: "/react笔录五" },
+          { text: "react笔录六", link: "/react笔录六" },
         ],
       },
     ],
