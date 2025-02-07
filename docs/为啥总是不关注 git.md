@@ -1,7 +1,7 @@
 <!--
  * @Author: qs
  * @Date: 2025-01-24 17:45:53
- * @LastEditTime: 2025-01-25 00:20:37
+ * @LastEditTime: 2025-02-04 20:29:58
  * @LastEditors: qs
  * @Description:
  * @FilePath: /coderPanz.github.io/docs/为啥总是不关注 git.md
@@ -67,6 +67,173 @@ Git 中添加文件需要分为 add 和 commit 两步，主要是为了提供更
 
 
 ## 工作区与暂存区
-  工作区：就是你在电脑里能看到的目录，项目所在的目录。工作区中有一个 `.git` 文件，是隐藏起来的，这个不算工作区，而是Git的版本库。  
-  Git的版本库里存了很多东西，其中最重要的就是称为stage（或者叫index）的暂存区，还有Git为我们自动创建的第一个分支master，以及指向 master的一个指针叫HEAD。  
-![斩神](/git暂存区.png)
+  &emsp;&emsp;工作区：就是你在电脑里能看到的目录，项目所在的目录。工作区中有一个 `.git` 文件，是隐藏起来的，这个不算工作区，而是Git的版本库。  
+  &emsp;&emsp;Git的版本库里存了很多东西，其中最重要的就是称为stage（或者叫index）的暂存区，还有Git为我们自动创建的第一个分支master，以及指向 master的一个指针叫HEAD。  
+![暂存区](/git暂存区.png)
+
+把文件往Git版本库里添加的时候，是分两步执行的：  
+- 第一步是用git add把文件添加进去，实际上就是把文件修改添加到暂存区；
+- 第二步是用git commit提交更改，实际上就是把暂存区的所有内容提交到当前分支。
+
+
+### 管理与修改
+&emsp;&emsp;为什么Git比其他版本控制系统设计得优秀，因为Git跟踪并管理的是修改，而非文件。  
+你会问，什么是修改？比如你新增了一行，这就是一个修改，删除了一行，也是一个修改，更改了某些字符，也是一个修改，删了一些又加了一些，也是一个修改，甚至创建一个新文件，也算一个修改。  
+数据完整性：Git 使用 SHA-1 哈希值标识每次修改，确保数据的完整性和可追溯性。
+
+### 撤销修改
+**1. 撤销工作区的修改**  
+如果你在工作区（尚未 git add）修改了文件，但想撤销这些修改，恢复到上次提交的状态，这会用最近一次提交的版本覆盖工作区的文件：  
+`git checkout -- <file>`
+如果你想撤销所有文件的修改：  
+`git checkout -- .`  
+
+**2. 撤销暂存区的修改**  
+如果你已经将修改添加到暂存区（git add），但想撤销暂存区的修改，将其放回工作区，这会取消暂存区的修改，但不会影响工作区的文件内容。：  
+`git reset HEAD <file>`  
+如果你想取消所有文件的暂存：  
+`git reset HEAD .`  
+
+**3. 撤销已提交的修改**  
+如果你已经提交了修改（git commit），但想撤销提交，有以下几种方式：  
+(1) 回退到上个版本的**未添加到暂存区状态**: `git reset --soft HEAD^`  
+
+(2) 回退到上个版本的**已提交状态（无需 commit 操作）**：`git reset --hard HEAD^`  
+
+(3) 回退到上个版本**已添加但未提交的状态**: `git reset ----mixed HEAD^`  
+
+**4. 撤销本地未推送的提交（回退到指定版本）**  
+&emsp;&emsp;如果你在本地提交了多次修改，但还没有推送到远程仓库，可以通过以下方式撤销：`git reset --hard <commit-hash>`  
+
+**5. 撤销已推送到远程仓库的提交**  
+&emsp;&emsp;如果你已经将提交推送到远程仓库，建议使用 git revert 来撤销：`git revert <commit-hash>`  
+- 这会生成一个新的提交，撤销指定提交的修改。
+- 然后你可以将新的提交推送到远程仓库：`git push origin <branch-name>`  
+
+总结  
+- 工作区修改：`git checkout -- <file>`
+- 暂存区修改：`git reset HEAD <file>`
+- 已提交修改：
+- 撤销提交但保留修改：`git reset --soft HEAD^`
+- 撤销提交并丢弃修改：`git reset --hard HEAD^`
+- 生成反向提交：`git revert HEAD`
+- 已推送提交：使用 `git revert` 生成反向提交并推送。
+
+## 远程仓库
+&emsp;&emsp;在本地创建本地仓库后，需要连接远程仓库，让这两个仓库进行远程同步，这样，GitHub上的仓库既可以作为备份，又可以让其他人通过该仓库来协作，真是一举多得。  
+`git remote add origin git@github.com:abb/bba`  
+
+添加后，远程库的名字就是origin，这是Git默认的叫法，也可以改成别的，但是origin这个名字一看就知道是远程库。  
+`git push <远程仓库名> <分支名>` 
+下一步，就可以把本地库的所有内容推送到远程库上：`git push -u origin master`  
+把本地库的内容推送到远程，用git push命令，实际上是把当前分支master推送到远程。  
+由于远程库是空的，我们第一次推送master分支时，加上了-u参数，Git不但会把本地的master分支内容推送的远程新的master分支，还会把本地的master分支和远程的master分支关联起来，在以后的推送或者拉取时就可以简化命令。  
+从现在起，只要本地作了提交，就可以通过命令：`git push origin master` 把本地 master 分支的最新修改推送至GitHub，现在，你就拥有了真正的分布式版本库！
+
+- `git push`: 如果当前分支已经与远程分支关联，可以直接运行 git push。
+- `git push origin <分支名>`: 推送指定分支到远程仓库。
+- `git push -u origin <分支名>`: 推送并设置上游分支（关联远程分支）
+- `git push --force`: 强制推送会覆盖远程仓库的历史记录，慎用！通常用于修复提交历史或回退提交。
+
+QA：如果我在本地新建了一个分支 test，但远程并没有该分支，那我应该怎么进行推送。  
+`git push -u origin test`
+- -u 或 --set-upstream：将本地分支与远程分支关联，并设置远程分支为默认的上游分支。  
+- origin：远程仓库的名称（通常是 origin）。
+- test：本地分支的名称。
+
+执行后，Git 会在远程仓库中创建一个同名分支 test，并将本地分支的提交推送到远程分支。
+
+验证推送结果: 推送完成后，你可以通过以下命令查看远程分支是否创建成功：`git branch -r`,这会列出所有远程分支，你应该能看到 origin/test。
+
+后续操作: 一旦本地分支与远程分支关联，可以直接使用 `git push` 。
+
+## 分支管理
+### 分支的创建与切换
+&emsp;&emsp;每次提交，Git都把它们串成一条时间线，这条时间线就是一个分支。截止到目前，只有一条时间线，在Git里，这个分支叫主分支，即master分支。HEAD严格来说不是指向提交，而是指向master，master才是指向提交的，所以，HEAD指向的就是当前分支。  
+
+一开始的时候，master分支是一条线，Git用master指向最新的提交，再用HEAD指向master，就能确定当前分支，以及当前分支的提交点：  
+
+![分支管理](/分支管理.png)  
+
+&emsp;&emsp;每次提交，master分支都会向前移动一步，这样，随着你不断提交，master分支的线也越来越长。  
+当我们创建新的分支，例如dev时，Git新建了一个指针叫dev，指向master相同的提交，再把HEAD指向dev，就表示当前分支在dev上：  
+
+![分支管理二](/分支管理二.png)  
+
+Git创建一个分支很快，因为除了增加一个dev指针，改改HEAD的指向，工作区的文件都没有任何变化！  
+不过，从现在开始，对工作区的修改和提交就是针对dev分支了，比如新提交一次后，dev指针往前移动一步，而master指针不变：  
+
+![分支管理三](/分支管理三.png)  
+假如我们在dev上的工作完成了，就可以把dev合并到master上。Git怎么合并呢？最简单的方法，就是直接把master指向dev的当前提交，就完成了合并：  
+
+![分支管理四](/分支管理四.png)  
+所以Git合并分支也很快！就改改指针，工作区内容也不变！  
+
+合并完分支后，甚至可以删除dev分支。删除dev分支就是把dev指针给删掉，删掉后，我们就剩下了一条master分支：  
+![分支管理五](/分支管理五.png)  
+
+### switch
+我们注意到切换分支使用 `git checkout <branch>`，而前面讲过的撤销修改则是 `git checkout -- <file>`，同一个命令，有两种作用，确实有点令人迷惑。  
+
+实际上，切换分支这个动作，用switch更科学。因此，最新版本的Git提供了新的git switch命令来切换分支：  
+
+创建并切换到新的dev分支，可以使用：`git switch -c dev`; 直接切换到已有的master分支，可以使用：`git switch master`，使用新的git switch命令，比git checkout要更容易理解。  
+
+小结
+- 查看分支：`git branch`
+- 创建分支：`git branch <name>`
+- 切换分支：`git checkout <name>或者git switch <name>`
+- 创建+切换分支：`git checkout -b <name>或者git switch -c <name>`
+- 合并某分支到当前分支：`git merge <name>`
+- 删除分支：`git branch -d <name>`
+
+
+### 冲突问题
+&emsp;&emsp;切换分支的唯一条件是工作区必须是干净的（没有未提交的修改）。  
+在 master 分支中切一个 feature1 新的分支，并在这个分支对文件进行修改，提交后进行切换，并在 master 分支上进行修改后并提交，下面是两个分支的提交情况。  
+![分支管理六](/分支管理六.png)  
+
+这种情况下 `git merge feature1`，Git无法执行“快速合并”，只能试图把各自的修改合并起来，但这种合并就可能会有冲突，**需要手动解决冲突后再提交**。  
+
+解决冲突后：master 分支和 feature1 分支变成了下图所示：  
+![分支管理七](/分支管理七.png)  
+
+### 分支管理策略
+通常，合并分支时，如果可能，Git会用Fast forward模式，但这种模式下，删除分支后，会丢掉分支信息。如果要强制禁用Fast forward模式，Git就会在merge时生成一个新的commit，这样，从分支历史上就可以看出分支信息。  
+
+我们使用 `--no-ff` 方式的 git merge：  
+首先，仍然创建并切换dev分支：`git switch -c dev`  
+修改文件后，并提交一个新的commit：`git add readme.txt && commit -m "add merge"`  
+现在，我们切换回master：`git switch master`  
+准备合并dev分支，请注意--no-ff参数，表示禁用Fast forward：`git merge --no-ff -m "merge with no-ff" dev`,因为本次合并要创建一个新的commit，所以加上-m参数，把commit描述写进去。  
+合并后，我们用git log看看分支历史, 可以看到，不使用Fast forward模式，merge后就像这样：  
+![分支管理八](/分支管理八.png)  
+
+合并分支时，加上--no-ff参数就可以用普通模式合并，合并后的历史有分支，能看出来曾经做过合并，而fast forward合并就看不出来曾经做过合并。  
+
+### 多人协作
+当你从远程仓库克隆时，实际上Git自动把本地的master分支和远程的master分支对应起来了，并且，远程仓库的默认名称是origin。  
+推送分支： 推送分支，就是把该分支上的所有本地提交推送到远程库。推送时，要指定本地分支，这样，Git就会把该分支推送到远程库对应的远程分支上,`git push origin master`。  
+
+### Rebase
+  &emsp;&emsp;多人在同一个分支上协作时，很容易出现冲突。即使没有冲突，后push的童鞋不得不先pull，在本地合并，然后才能push成功，每次合并再push，让分支管理变得混乱。  
+
+  &emsp;&emsp;总之看上去很乱，有强迫症的童鞋会问：为什么Git的提交历史不能是一条干净的直线？  
+Git有一种称为rebase的操作，有人把它翻译成“变基”。从实际问题出发，看看怎么把分叉的提交变成直线。  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
