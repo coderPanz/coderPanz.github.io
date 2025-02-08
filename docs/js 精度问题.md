@@ -1,7 +1,7 @@
 <!--
  * @Author: qs
  * @Date: 2025-02-07 17:38:30
- * @LastEditTime: 2025-02-07 17:58:28
+ * @LastEditTime: 2025-02-08 17:38:48
  * @LastEditors: qs
  * @Description:
  * @FilePath: /coderPanz.github.io/docs/js 精度问题.md
@@ -93,6 +93,30 @@ console.log(9007199254740991 + 2); // 9007199254740992 ❌（错误！）
 - 乘以 10^n 后再除回去（适用于货币计算）
 - Math.fround()：可以将任意的数字转换为离它最近的单精度浮点数形式的数字（Math.fround() 使用 32 位浮点数存储数据，可以在某些情况下减少精度误差）。
 - 数字格式转化时可以先转化为字符串，使用字符串操作，避免进行 js 计算从而避免精度问题。
+
+### 实战案例
+后端返回整数金额，单位为分，前端需要转换为元。  
+```js
+  if (!amount) return '0.00';
+  const str = amount.toString();
+  let integerPart: string // 整数部分
+  let decimalPart: string; // 小数部分
+
+  if (str.length <= 2) {
+    // 当不足三位数时，例如 5、50；转化后，整数部分为零，所以需要 padStart 处理小数部分（5->0.05;50->0.50）
+    integerPart = '0';
+    // padStart 补齐小数部分
+    decimalPart = str.padStart(2, '0');
+  } else {
+    // 分割出整数部分和小数部分
+    integerPart = str.slice(0, -2);
+    decimalPart = str.slice(-2);
+  }
+
+  // 给整数部分添加千分位分隔符
+  integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return `${integerPart}.${decimalPart}`;
+```
 
 
 
