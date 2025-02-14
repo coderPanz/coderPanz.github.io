@@ -26,7 +26,7 @@ export default defineConfig({
         ],
       },
       {
-        text: "行业前端技术动态",
+        text: "行业技术动态",
         collapsed: true,
         items: [{ text: "哈啰跨端组件库", link: "/哈啰跨端组件库" }],
       },
