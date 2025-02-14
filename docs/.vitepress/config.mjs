@@ -11,7 +11,7 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: "主页", link: "/" },
-      { text: "开篇", link: "/markdown-examples" },
+      { text: "开篇", link: "/我不知道的javascript一" },
     ],
 
     sidebar: [
@@ -19,7 +19,7 @@ export default defineConfig({
       //   text: "前言简叙",
       //   collapsed: true,
       //   items: [
-      //     { text: "手札", link: "/markdown-examples" },
+      //     { text: "手札", link: "/" },
       //     { text: "随笔一", link: "/随笔一" },
       //     { text: "随笔二", link: "/随笔二" },
       //     { text: "随笔三", link: "/随笔三" },

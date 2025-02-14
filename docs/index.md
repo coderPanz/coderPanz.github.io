@@ -12,7 +12,7 @@ hero:
   actions: 
     - theme: brand
       text: 查看详情
-      link: /markdown-examples
+      link: /我不知道的javascript一
     - theme: alt
       text: 在Github上查看
       link: /api-examples
