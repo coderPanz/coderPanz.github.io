@@ -15,16 +15,16 @@ export default defineConfig({
     ],
 
     sidebar: [
-      {
-        text: "前言简叙",
-        collapsed: true,
-        items: [
-          { text: "手札", link: "/markdown-examples" },
-          { text: "随笔一", link: "/随笔一" },
-          { text: "随笔二", link: "/随笔二" },
-          { text: "随笔三", link: "/随笔三" },
-        ],
-      },
+      // {
+      //   text: "前言简叙",
+      //   collapsed: true,
+      //   items: [
+      //     { text: "手札", link: "/markdown-examples" },
+      //     { text: "随笔一", link: "/随笔一" },
+      //     { text: "随笔二", link: "/随笔二" },
+      //     { text: "随笔三", link: "/随笔三" },
+      //   ],
+      // },
       {
         text: "行业技术动态",
         collapsed: true,
