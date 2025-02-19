@@ -1,7 +1,7 @@
 <!--
  * @Author: qs
  * @Date: 2025-01-24 17:45:53
- * @LastEditTime: 2025-02-19 14:13:37
+ * @LastEditTime: 2025-02-19 15:10:40
  * @LastEditors: qs
  * @Description:
  * @FilePath: /coderPanz.github.io/docs/为啥总是不关注 git.md
@@ -219,7 +219,7 @@ Git创建一个分支很快，因为除了增加一个dev指针，改改HEAD的�
   
 **多人在同一个分支上协作时**，很容易出现冲突。即使没有冲突，后push的童鞋不得不先pull，在本地合并，然后才能push成功，每次合并再push，让分支管理变得混乱。  
 
-每次合并再push后，分支变成了这样：  
+每次合并再push后，提交就会分叉
 ```git
 $ git log --graph --pretty=oneline --abbrev-commit
 * d1be385 (HEAD -> master, origin/master) init hello
@@ -260,19 +260,122 @@ $ git log --graph --pretty=oneline --abbrev-commit
 ```
   (HEAD -> master)和(origin/master)标识出当前分支的最新提交HEAD和远程origin的位置分别是582d922 add author和d1be385 init hello，**说明本地分支比远程分支快两个提交。**  
  如果现在尝试推送 `master` 分支的话，结果是失败的。失败原因：本地分支比远程分支快了两个提交
+ 
+ ```git
+ $ git push origin master
+To github.com:michaelliao/learngit.git
+ ! [rejected]        master -> master (fetch first)
+error: failed to push some refs to 'git@github.com:michaelliao/learngit.git'
+hint: Updates were rejected because the remote contains work that you do
+hint: not have locally. This is usually caused by another repository pushing
+hint: to the same ref. You may want to first integrate the remote changes
+hint: (e.g., 'git pull ...') before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+ ```
+推送失败：有人先于我们推送了远程分支，所以需要 pull/fetch  
+```git
+$ git pull
+remote: Counting objects: 3, done.
+remote: Compressing objects: 100% (1/1), done.
+remote: Total 3 (delta 1), reused 3 (delta 1), pack-reused 0
+Unpacking objects: 100% (3/3), done.
+From github.com:michaelliao/learngit
+   d1be385..f005ed4  master     -> origin/master
+ * [new tag]         v1.0       -> v1.0
+Auto-merging hello.py
+Merge made by the 'recursive' strategy.
+ hello.py | 1 +
+ 1 file changed, 1 insertion(+)
+```
+
+再用git status看看状态：
+```git
+$ git status
+On branch master
+Your branch is ahead of 'origin/master' by 3 commits.
+  (use "git push" to publish your local commits)
+
+nothing to commit, working tree clean
+```
+加上刚才合并的提交，现在我们本地分支比远程分支超前3个提交。
+```git
+$ git log --graph --pretty=oneline --abbrev-commit
+*   e0ea545 (HEAD -> master) Merge branch 'master' of github.com:michaelliao/learngit
+|\  
+| * f005ed4 (origin/master) set exit=1
+* | 582d922 add author
+* | 8875536 add comment
+|/  
+* d1be385 init hello
+...
+```
+提交历史分叉了，因为多人在同一条分支上进行开发，这其实没什么问题，但对比版本回退等工作不好管理，提交记录也相对混乱，这时候我们可以用 rebase 变基。  
+以下是 git rebase 的结果  
+```git
+$ git log --graph --pretty=oneline --abbrev-commit
+* 7e61ed4 (HEAD -> master) add author
+* 3611cfe add comment
+* f005ed4 (origin/master) set exit=1
+* d1be385 init hello
+```
+原本分叉的提交现在变成一条直线，发现Git把我们本地的提交“挪动”了位置，放到了f005ed4 (origin/master) set exit=1之后，这样，整个提交历史就成了一条直线。rebase操作前后，最终的提交内容是一致的，但是，我们本地的commit修改内容已经变化了，它们的修改不再基于d1be385 init hello，而是基于f005ed4 (origin/master) set exit=1，但最后的提交7e61ed4内容是一致的。  
+最后通过 push 推送到远程分支看看效果：
+```git
+$ git log --graph --pretty=oneline --abbrev-commit
+* 7e61ed4 (HEAD -> master, origin/master) add author
+* 3611cfe add comment
+* f005ed4 set exit=1
+* d1be385 init hello
+...
+```
+本质操作：将某个分支的提交历史「剪切」后，「粘贴」到另一个分支的最新节点上，形成线性历史。
+在提供一个示例场景：  
+- 假设存在分支 feature（提交记录 A→B→C）和 master（提交记录 A→D→E）。
+- 执行 git checkout feature; git rebase master 后：
+- Git 会找到 feature 和 master 的共同祖先提交 A。
+- 提取 feature 的差异提交 B 和 C，临时保存为补丁（patch）。
+- 将待变基分支（feature）的指针指向目标分支（master）的最新提交生成提交E
+- 将补丁 B 和 C 依次应用到 E 上，生成新提交 B' 和 C'（哈希值改变）。
+- 最终提交历史：A→D→E→B'→C'（线性结构，无分叉）。
+- 哈希值变化：由于提交的父节点、时间戳等信息改变，新提交的哈希值与原提交不同。这意味着 rebase 会重写历史。
 
 
+## 标签管理
+Git 标签（Tag）是用于标记代码库中某个特定提交（Commit）的指针，常用于标识重要的里程碑（如版本发布）。  
+原理：本质是一个指向特定提交的不可变指针（类似分支，但不可移动），不存储额外信息，仅包含提交的哈希值。  
+使用场景：  
+- 版本发布：标记 v1.0.0、v2.3.1 等正式版本，便于快速定位代码快照。
+- 重要节点：标记代码审查通过、测试验证完成等关键节点。
 
+```git
+# 轻量标签（直接关联当前提交）
+git tag v1.0.0
 
+# 附注标签（推荐用于正式版本）
+git tag -a v1.0.0 -m "Release version 1.0.0"
 
+# 对历史提交打标签
+git tag -a v0.9.0 9fceb02 -m "Beta version"
 
+# 列出所有标签
+git tag
 
+# 查看标签详情（显示提交信息和标签元数据）
+git show v1.0.0
 
+# 推送单个标签
+git push origin v1.0.0
 
+# 推送所有本地标签
+git push origin --tags
 
+# 删除本地标签
+git tag -d v1.0.0
 
-
-
+# 删除远程标签
+git push origin :refs/tags/v1.0.0
+```
+Git 标签是代码版本管理的核心工具，通过轻量级指针或完整的元数据对象，帮助团队精准定位关键提交。结合分支策略和 CI/CD 流程，标签能有效提升发布效率和代码可追溯性。
 
 
 
