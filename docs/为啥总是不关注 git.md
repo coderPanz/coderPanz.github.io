@@ -1,7 +1,7 @@
 <!--
  * @Author: qs
  * @Date: 2025-01-24 17:45:53
- * @LastEditTime: 2025-02-19 14:11:55
+ * @LastEditTime: 2025-02-19 14:13:37
  * @LastEditors: qs
  * @Description:
  * @FilePath: /coderPanz.github.io/docs/为啥总是不关注 git.md
@@ -259,7 +259,7 @@ $ git log --graph --pretty=oneline --abbrev-commit
 ...
 ```
   (HEAD -> master)和(origin/master)标识出当前分支的最新提交HEAD和远程origin的位置分别是582d922 add author和d1be385 init hello，**说明本地分支比远程分支快两个提交。**  
- 如果现在尝试推送 `master` 分支的话，结果是失败的。失败原因：
+ 如果现在尝试推送 `master` 分支的话，结果是失败的。失败原因：本地分支比远程分支快了两个提交
 
 
 
