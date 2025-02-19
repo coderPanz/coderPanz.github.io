@@ -1,7 +1,7 @@
 <!--
  * @Author: qs
  * @Date: 2025-01-24 17:45:53
- * @LastEditTime: 2025-02-04 20:29:58
+ * @LastEditTime: 2025-02-19 14:11:55
  * @LastEditors: qs
  * @Description:
  * @FilePath: /coderPanz.github.io/docs/为啥总是不关注 git.md
@@ -216,10 +216,51 @@ Git创建一个分支很快，因为除了增加一个dev指针，改改HEAD的�
 推送分支： 推送分支，就是把该分支上的所有本地提交推送到远程库。推送时，要指定本地分支，这样，Git就会把该分支推送到远程库对应的远程分支上,`git push origin master`。  
 
 ### Rebase
-  &emsp;&emsp;多人在同一个分支上协作时，很容易出现冲突。即使没有冲突，后push的童鞋不得不先pull，在本地合并，然后才能push成功，每次合并再push，让分支管理变得混乱。  
+  
+**多人在同一个分支上协作时**，很容易出现冲突。即使没有冲突，后push的童鞋不得不先pull，在本地合并，然后才能push成功，每次合并再push，让分支管理变得混乱。  
+
+每次合并再push后，分支变成了这样：  
+```git
+$ git log --graph --pretty=oneline --abbrev-commit
+* d1be385 (HEAD -> master, origin/master) init hello
+*   e5e69f1 Merge branch 'dev'
+|\  
+| *   57c53ab (origin/dev, dev) fix env conflict
+| |\  
+| | * 7a5e5dd add env
+| * | 7bd91f1 add new env
+| |/  
+* |   12a631b merged bug fix 101
+|\ \  
+| * | 4c805e2 fix bug 101
+|/ /  
+* |   e1e9c68 merge with no-ff
+|\ \  
+| |/  
+| * f52c633 add merge
+|/  
+*   cf810e4 conflict fixed
+```
 
   &emsp;&emsp;总之看上去很乱，有强迫症的童鞋会问：为什么Git的提交历史不能是一条干净的直线？  
-Git有一种称为rebase的操作，有人把它翻译成“变基”。从实际问题出发，看看怎么把分叉的提交变成直线。  
+**Git有一种称为rebase的操作，有人把它翻译成“变基”**。从实际问题出发，看看怎么把分叉的提交变成直线。  
+场景：在和远程分支 master 同步后，对某个文件进行修改并提交
+```git
+$ git log --graph --pretty=oneline --abbrev-commit
+* 582d922 (HEAD -> master) add author
+* 8875536 add comment
+* d1be385 (origin/master) init hello
+*   e5e69f1 Merge branch 'dev'
+|\  
+| *   57c53ab (origin/dev, dev) fix env conflict
+| |\  
+| | * 7a5e5dd add env
+| * | 7bd91f1 add new env
+...
+```
+  (HEAD -> master)和(origin/master)标识出当前分支的最新提交HEAD和远程origin的位置分别是582d922 add author和d1be385 init hello，**说明本地分支比远程分支快两个提交。**  
+ 如果现在尝试推送 `master` 分支的话，结果是失败的。失败原因：
+
 
 
 
