@@ -31,6 +31,7 @@ export default defineConfig({
         items: [
           { text: "哈啰跨端组件库", link: "/哈啰跨端组件库" },
           { text: "deepseek", link: "/deepseek" },
+          { text: "Rspack", link: "/Rspack" },
         ],
       },
       {
