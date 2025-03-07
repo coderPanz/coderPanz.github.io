@@ -1,7 +1,7 @@
 <!--
  * @Author: qs
  * @Date: 2025-03-06 19:13:56
- * @LastEditTime: 2025-03-06 19:24:19
+ * @LastEditTime: 2025-03-07 18:49:54
  * @LastEditors: qs
  * @Description:
  * @FilePath: /coderPanz.github.io/docs/Rspack.md
@@ -9,8 +9,7 @@
 -->
 
 # Rspack：字节跳动的高性能前端打包工具
-
-作为一名程序员，我最近发现了一个非常有趣的工具——Rspack。它是字节跳动推出的高性能前端打包工具，旨在解决大型前端应用的构建性能瓶颈。今天，我就来和大家分享一下 Rspack 的特点和使用体验。
+最近发现了一个非常有趣的工具——Rspack。它是字节跳动推出的高性能前端打包工具，旨在解决大型前端应用的构建性能瓶颈，今天给大家分享一下 RSpack。
 ![rspack](/rspack.png)
 
 ### Rspack 的背景
@@ -50,23 +49,21 @@ npm create rspack@latest
 
 如果你已经有一个现有项目，并希望迁移到 Rspack，可以参考官方提供的迁移指南。Rspack 与 Webpack 的兼容性使得迁移过程非常顺畅，你可以在不改变现有项目结构的情况下，享受到 Rspack 的性能优势。
 
-### 我的使用体验
 
-我尝试将一个中型项目从 Webpack 迁移到 Rspack，整个过程非常顺利。Rspack 的配置方式与 Webpack 非常相似，但配置文件更加简洁，易于理解。在构建速度方面，Rspack 确实表现出色，项目的启动和构建时间都大幅缩短，尤其是在开发环境中，HMR 的速度让我印象深刻，极大地提升了开发效率。
-
-### 如何迁移现有项目到 Rspack？
 ## 如何迁移现有项目到 Rspack？
 
 将现有项目迁移到 Rspack 可以显著提升构建性能和开发效率。以下是详细的迁移步骤和注意事项：
 
-### 1. 环境准备
+**1. 环境准备**  
+
 
 确保你的项目环境满足以下要求：
 
 - Node.js >= 16 版本，推荐使用 Node.js LTS 版本。
 - 安装 Rust 编程语言，因为 Rspack 是基于 Rust 开发的。
 
-### 2. 安装 Rspack 依赖
+**2. 安装 Rspack 依赖**  
+
 
 首先，移除项目中与 Webpack 相关的依赖：
 
@@ -80,7 +77,8 @@ npm remove webpack webpack-cli webpack-dev-server
 npm add @rspack/core @rspack/cli -D
 ```
 
-### 3. 更新 `package.json` 脚本
+**3. 更新 `package.json` 脚本**  
+
 
 更新 `package.json` 中的构建脚本，使用 Rspack 代替 Webpack：
 
@@ -93,12 +91,12 @@ npm add @rspack/core @rspack/cli -D
 }
 ```
 
-### 4. 配置文件迁移
+**4. 配置文件迁移**  
+
 
 将 `webpack.config.js` 文件重命名为 `rspack.config.js`。Rspack 的配置文件格式与 Webpack 类似，但有一些差异。以下是一些常见的配置项迁移示例：
 
-#### 4.1 修改配置文件
-
+**4.1 修改配置文件**  
 假设你的 `webpack.config.js` 文件内容如下：
 
 ```javascript
@@ -162,9 +160,9 @@ module.exports = {
 };
 ```
 
-### 5. 迁移 Loader 和插件
+**5. 迁移 Loader 和插件**  
 
-#### 5.1 Loader 迁移
+**5.1 Loader 迁移**  
 
 Rspack 支持绝大多数 Webpack loader，但为了获得最佳性能，建议进行以下迁移：
 
@@ -268,7 +266,7 @@ module.exports = {
 };
 ```
 
-### 6. 迁移 Vue CLI 项目
+**6. 迁移 Vue CLI 项目**  
 
 如果你的项目是基于 Vue CLI 的，可以参考以下步骤进行迁移：
 
@@ -392,7 +390,8 @@ module.exports = {
    });
    ```
 
-### 7. 迁移 Create React App 项目
+**7. 迁移 Create React App 项目**  
+
 
 如果你的项目是基于 Create React App 的，可以参考以下步骤进行迁移：
 
@@ -456,7 +455,7 @@ module.exports = {
    });
    ```
 
-### 8. 迁移 Vite 项目
+**8. 迁移 Vite 项目**  
 
 如果你的项目是基于 Vite 的，可以参考以下步骤进行迁移：
 
@@ -539,7 +538,7 @@ module.exports = {
    };
    ```
 
-### 10. 迁移 Nuxt 项目
+**10. 迁移 Nuxt 项目**  
 
 如果你的项目是基于 Nuxt 的，可以参考以下步骤进行迁移：
 
@@ -660,11 +659,6 @@ Rspack 作为一款基于 Rust 语言开发的高性能前端打包工具，相�
   |生产构建|42秒|15秒|
   |开发服务器热构建时间|约300毫秒|约170毫秒|
 
-### 总结
-
-Rspack 在多个方面显著提升了项目性能，包括构建速度、HMR 性能、内存使用和代码压缩体积等。对于大型和中型项目，Rspack 的性能提升尤为明显，能够显著提高开发效率和构建速度。如果你正在寻找一个高性能的前端构建工具，Rspack 值得一试！
-
-希望这篇博客能够帮助你更好地了解 Rspack 的性能提升，如果你有任何问题或建议，欢迎在评论区留言！
 ### 总结
 
 Rspack 是一个非常有潜力的前端打包工具，它不仅解决了大型项目的构建性能问题，还通过兼容 Webpack 生态和丰富的生态系统，为开发者提供了更多的选择和便利。如果你正在寻找一个高性能的前端构建工具，Rspack 值得一试！
